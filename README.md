@@ -58,7 +58,8 @@ The application will start on `http://localhost:8080`.
 
 ## 📚 API Documentation
 
-(Optional: Add link to Swagger/OpenAPI UI if available, e.g., `http://localhost:8080/swagger-ui.html`)
+You can view the API documentation and test endpoints using Swagger UI:
+[http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html)
 
 ## 🤝 Contributing
 
