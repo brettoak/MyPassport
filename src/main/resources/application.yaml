@@ -1,44 +1,19 @@
 spring:
   application:
     name: MyPassport
-  datasource:
-    # H2 Database (Default)
-    # url: jdbc:h2:mem:testdb
-    # driver-class-name: org.h2.Driver
-    # username: sa
-    # password:
-
-    # MySQL Database (Docker)
-    url: jdbc:mysql://localhost:3308/mypassport?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-    username: root
-    password: root
-    driver-class-name: com.mysql.cj.jdbc.Driver
+  profiles:
+    active: dev
+  
+  # Shared Configuration
   jpa:
-    hibernate:
-      ddl-auto: validate
-    show-sql: true
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
+  
   flyway:
     enabled: true
     baseline-on-migrate: true
-  data:
-    redis:
-      host: localhost
-      port: 6379
-  mail:
-    host: smtp.example.com # e.g., smtp.gmail.com
-    port: 587
-    username: user@example.com
-    password: password
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
-            required: true
 
+# Common Server Config (can be overridden in profiles)
 server:
   port: 8089
