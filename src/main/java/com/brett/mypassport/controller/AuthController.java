@@ -1,7 +1,9 @@
 package com.brett.mypassport.controller;
 
 import com.brett.mypassport.common.ApiConstants;
+import com.brett.mypassport.dto.RegisterRequest;
 import com.brett.mypassport.dto.VerificationRequest;
+import com.brett.mypassport.service.UserService;
 import com.brett.mypassport.service.VerificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +25,9 @@ public class AuthController {
     @Autowired
     private VerificationService verificationService;
 
+    @Autowired
+    private UserService userService;
+
     @Operation(summary = "Send Verification Code", description = "Generates a verification code and sends it to the provided email address. The code expires in 60 seconds.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Verification code sent successfully"),
@@ -41,6 +46,25 @@ public class AuthController {
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.internalServerError().body("Failed to send code: " + e.getMessage());
+        }
+    }
+
+    @Operation(summary = "Register User", description = "Registers a new user. Requires a valid verification code sent to the email.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User registered successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid input or verification code"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    @PostMapping("/register")
+    public ResponseEntity<String> register(@RequestBody RegisterRequest request) {
+        try {
+            userService.registerUser(request);
+            return ResponseEntity.ok("User registered successfully.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body("Failed to register user: " + e.getMessage());
         }
     }
 }
