@@ -1,5 +1,6 @@
 package com.brett.mypassport.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RestController
 @RequestMapping("/api")
 @Validated
+@Tag(name = "Hello", description = "APIs for greeting messages")
 public class HelloController {
 
     @Operation(summary = "Echo message", description = "Returns the input message if it is within 20 characters.")
