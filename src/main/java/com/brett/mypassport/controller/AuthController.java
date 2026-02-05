@@ -1,6 +1,8 @@
 package com.brett.mypassport.controller;
 
 import com.brett.mypassport.common.ApiConstants;
+import com.brett.mypassport.dto.LoginRequest;
+import com.brett.mypassport.dto.LoginResponse;
 import com.brett.mypassport.dto.RegisterRequest;
 import com.brett.mypassport.dto.VerificationRequest;
 import com.brett.mypassport.service.UserService;
@@ -65,6 +67,25 @@ public class AuthController {
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.internalServerError().body("Failed to register user: " + e.getMessage());
+        }
+    }
+
+    @Operation(summary = "Login User", description = "Authenticates a user and returns a JWT token.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Login successful"),
+            @ApiResponse(responseCode = "401", description = "Invalid credentials"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+        try {
+            LoginResponse response = userService.login(request);
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(401).body(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body("Failed to login: " + e.getMessage());
         }
     }
 }
