@@ -3,8 +3,10 @@ package com.brett.mypassport.service;
 import com.brett.mypassport.dto.LoginRequest;
 import com.brett.mypassport.dto.LoginResponse;
 import com.brett.mypassport.dto.RegisterRequest;
+import com.brett.mypassport.entity.Token;
 import com.brett.mypassport.entity.User;
 import com.brett.mypassport.common.JwtUtil;
+import com.brett.mypassport.repository.TokenRepository;
 import com.brett.mypassport.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,6 +24,9 @@ public class UserService {
     @Autowired
     private JwtUtil jwtUtil;
 
+    @Autowired
+    private TokenRepository tokenRepository;
+
     public LoginResponse login(LoginRequest request) {
         // 1. Find user by email (or username, logic can be added)
         User user = userRepository.findByEmail(request.getEmail())
@@ -32,11 +37,32 @@ public class UserService {
             throw new IllegalArgumentException("Invalid email or password.");
         }
 
-        // 3. Generate Token
-        String token = jwtUtil.generateToken(user.getUsername());
+        // 3. Generate Tokens
+        String jwtToken = jwtUtil.generateToken(user.getUsername());
+        String refreshToken = jwtUtil.generateRefreshToken(user.getUsername());
 
-        // 4. Return Response
-        return new LoginResponse(user.getUsername(), user.getEmail(), token);
+        // 4. Save Token
+        saveUserToken(user, jwtToken);
+
+        // 5. Return Response
+        return new LoginResponse(
+                user.getUsername(),
+                user.getEmail(),
+                jwtToken,
+                jwtUtil.getExpirationTime(),
+                refreshToken,
+                jwtUtil.getRefreshTokenExpirationTime());
+    }
+
+    private void saveUserToken(User user, String jwtToken) {
+        // Option: Revoke old tokens here if needed
+        Token token = new Token();
+        token.setUser(user);
+        token.setToken(jwtToken);
+        token.setTokenType("BEARER");
+        token.setExpired(false);
+        token.setRevoked(false);
+        tokenRepository.save(token);
     }
 
     @Transactional
