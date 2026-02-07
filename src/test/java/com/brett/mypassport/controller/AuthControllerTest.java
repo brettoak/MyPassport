@@ -40,7 +40,13 @@ public class AuthControllerTest {
         loginRequest.setEmail("test@example.com");
         loginRequest.setPassword("password123");
 
-        LoginResponse loginResponse = new LoginResponse("testuser", "test@example.com", "fake-jwt-token");
+        LoginResponse loginResponse = new LoginResponse(
+                "testuser",
+                "test@example.com",
+                "fake-jwt-token",
+                3600000L,
+                "fake-refresh-token",
+                604800000L);
 
         when(userService.login(any(LoginRequest.class))).thenReturn(loginResponse);
 
