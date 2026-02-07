@@ -18,22 +18,34 @@ public class JwtUtil {
     // Ideally, store this in application.yaml
     private static final String SECRET_KEY = "mySuperSecretKeyForJwtSigningWhichShouldBeVeryLongAndSecure";
     private static final long EXPIRATION_TIME = 1000 * 60 * 60 * 10; // 10 hours
+    private static final long REFRESH_EXPIRATION_TIME = 1000 * 60 * 60 * 24 * 7; // 7 days
 
     private final Key key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
 
     public String generateToken(String username) {
-        Map<String, Object> claims = new HashMap<>();
-        return createToken(claims, username);
+        return createToken(new HashMap<>(), username, EXPIRATION_TIME);
     }
 
-    private String createToken(Map<String, Object> claims, String subject) {
+    public String generateRefreshToken(String username) {
+        return createToken(new HashMap<>(), username, REFRESH_EXPIRATION_TIME);
+    }
+
+    private String createToken(Map<String, Object> claims, String subject, long expirationTime) {
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
+    }
+
+    public long getExpirationTime() {
+        return EXPIRATION_TIME;
+    }
+
+    public long getRefreshTokenExpirationTime() {
+        return REFRESH_EXPIRATION_TIME;
     }
 
     public Boolean validateToken(String token, String username) {
