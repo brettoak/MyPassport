@@ -17,8 +17,8 @@ public class JwtUtil {
 
     // Ideally, store this in application.yaml
     private static final String SECRET_KEY = "mySuperSecretKeyForJwtSigningWhichShouldBeVeryLongAndSecure";
-    private static final long EXPIRATION_TIME = 1000 * 60 * 60 * 10; // 10 hours
-    private static final long REFRESH_EXPIRATION_TIME = 1000 * 60 * 60 * 24 * 7; // 7 days
+    private static final long EXPIRATION_TIME = 1000 * 60 * 60 * 2; // 2 hours
+    private static final long REFRESH_EXPIRATION_TIME = 1000 * 60 * 60 * 24; // 1 day
 
     private final Key key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
 
