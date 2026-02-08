@@ -42,7 +42,7 @@ public class UserService {
         String refreshToken = jwtUtil.generateRefreshToken(user.getUsername());
 
         // 4. Save Token
-        saveUserToken(user, jwtToken);
+        saveUserToken(user, jwtToken, refreshToken);
 
         // 5. Return Response
         return new LoginResponse(
@@ -54,11 +54,12 @@ public class UserService {
                 jwtUtil.getRefreshTokenExpirationTime());
     }
 
-    private void saveUserToken(User user, String jwtToken) {
+    private void saveUserToken(User user, String jwtToken, String refreshToken) {
         // Option: Revoke old tokens here if needed
         Token token = new Token();
         token.setUser(user);
         token.setToken(jwtToken);
+        token.setRefreshToken(refreshToken);
         token.setTokenType("BEARER");
         token.setExpired(false);
         token.setRevoked(false);

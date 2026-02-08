@@ -14,6 +14,9 @@ public class Token {
     @Column(unique = true, nullable = false, length = 512)
     private String token;
 
+    @Column(name = "refresh_token", length = 512)
+    private String refreshToken;
+
     @Column(name = "token_type")
     private String tokenType = "BEARER";
 
@@ -46,9 +49,10 @@ public class Token {
     public Token() {
     }
 
-    public Token(User user, String token, String tokenType, boolean revoked, boolean expired) {
+    public Token(User user, String token, String refreshToken, String tokenType, boolean revoked, boolean expired) {
         this.user = user;
         this.token = token;
+        this.refreshToken = refreshToken;
         this.tokenType = tokenType;
         this.revoked = revoked;
         this.expired = expired;
@@ -69,6 +73,14 @@ public class Token {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public String getRefreshToken() {
+        return refreshToken;
+    }
+
+    public void setRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
     }
 
     public String getTokenType() {
