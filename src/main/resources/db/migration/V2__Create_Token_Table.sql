@@ -1,6 +1,7 @@
 CREATE TABLE `tokens` (
     `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
     `token` VARCHAR(512) NOT NULL UNIQUE,
+    `refresh_token` VARCHAR(512),
     `token_type` VARCHAR(50) DEFAULT 'BEARER',
     `revoked` BOOLEAN DEFAULT FALSE,
     `expired` BOOLEAN DEFAULT FALSE,
