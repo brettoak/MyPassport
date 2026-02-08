@@ -11,6 +11,7 @@ import com.brett.mypassport.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Service
 public class UserService {
@@ -27,13 +28,16 @@ public class UserService {
     @Autowired
     private TokenRepository tokenRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     public LoginResponse login(LoginRequest request) {
         // 1. Find user by email (or username, logic can be added)
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid email or password."));
 
         // 2. Verify password (simple check for now, should be hashed)
-        if (!user.getPassword().equals(request.getPassword())) {
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new IllegalArgumentException("Invalid email or password.");
         }
 
@@ -86,7 +90,7 @@ public class UserService {
         User user = new User();
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
-        user.setPassword(request.getPassword()); // In a real app, hash this!
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
 
         userRepository.save(user);
     }
