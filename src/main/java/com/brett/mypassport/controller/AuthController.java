@@ -3,6 +3,7 @@ package com.brett.mypassport.controller;
 import com.brett.mypassport.common.ApiConstants;
 import com.brett.mypassport.dto.LoginRequest;
 import com.brett.mypassport.dto.LoginResponse;
+import com.brett.mypassport.dto.RefreshTokenRequest;
 import com.brett.mypassport.dto.RegisterRequest;
 import com.brett.mypassport.dto.VerificationRequest;
 import com.brett.mypassport.service.UserService;
@@ -86,6 +87,25 @@ public class AuthController {
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.internalServerError().body("Failed to login: " + e.getMessage());
+        }
+    }
+
+    @Operation(summary = "Refresh Token", description = "Generates a new access token and refresh token using a valid refresh token.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Token refresh successful"),
+            @ApiResponse(responseCode = "400", description = "Invalid or expired refresh token"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    @PostMapping("/refresh-token")
+    public ResponseEntity<?> refreshToken(@RequestBody RefreshTokenRequest request) {
+        try {
+            LoginResponse response = userService.refreshToken(request);
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body("Failed to refresh token: " + e.getMessage());
         }
     }
 }
