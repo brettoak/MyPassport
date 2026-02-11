@@ -2,6 +2,7 @@ package com.brett.mypassport.service;
 
 import com.brett.mypassport.dto.LoginRequest;
 import com.brett.mypassport.dto.LoginResponse;
+import com.brett.mypassport.dto.RefreshTokenRequest;
 import com.brett.mypassport.dto.RegisterRequest;
 import com.brett.mypassport.entity.Token;
 import com.brett.mypassport.entity.User;
@@ -93,5 +94,46 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(request.getPassword()));
 
         userRepository.save(user);
+    }
+
+    public LoginResponse refreshToken(RefreshTokenRequest request) {
+        String requestRefreshToken = request.getRefreshToken();
+
+        // 1. Find token in DB
+        Token token = tokenRepository.findByRefreshToken(requestRefreshToken)
+                .orElseThrow(() -> new IllegalArgumentException("Refresh token not found"));
+
+        // 2. Check if revoked or expired in DB
+        if (token.isRevoked() || token.isExpired()) {
+            throw new IllegalArgumentException("Refresh token is expired or revoked");
+        }
+
+        // 3. Verify signature and expiration (JWT level)
+        String username = token.getUser().getUsername();
+        if (!jwtUtil.validateToken(requestRefreshToken, username)) {
+            throw new IllegalArgumentException("Invalid refresh token");
+        }
+
+        // 4. Revoke old token
+        token.setRevoked(true);
+        token.setExpired(true);
+        tokenRepository.save(token);
+
+        // 5. Generate new tokens
+        User user = token.getUser();
+        String newJwtToken = jwtUtil.generateToken(user.getUsername());
+        String newRefreshToken = jwtUtil.generateRefreshToken(user.getUsername());
+
+        // 6. Save new token
+        saveUserToken(user, newJwtToken, newRefreshToken);
+
+        // 7. Return Response
+        return new LoginResponse(
+                user.getUsername(),
+                user.getEmail(),
+                newJwtToken,
+                jwtUtil.getExpirationTime(),
+                newRefreshToken,
+                jwtUtil.getRefreshTokenExpirationTime());
     }
 }
