@@ -154,6 +154,14 @@ public class UserService {
 
     @Transactional
     public void logoutAll(String tokenValue) {
+        // Ensure the initiating token is valid
+        Token initiatingToken = tokenRepository.findByToken(tokenValue)
+                .orElseThrow(() -> new IllegalArgumentException("Token not found"));
+
+        if (initiatingToken.isExpired() || initiatingToken.isRevoked()) {
+            throw new IllegalArgumentException("Token is already invalid");
+        }
+
         // Extract username from token
         String username = jwtUtil.extractUsername(tokenValue);
 
