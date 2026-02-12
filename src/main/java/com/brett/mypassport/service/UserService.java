@@ -1,5 +1,6 @@
 package com.brett.mypassport.service;
 
+import java.util.List;
 import com.brett.mypassport.dto.LoginRequest;
 import com.brett.mypassport.dto.LoginResponse;
 import com.brett.mypassport.dto.RefreshTokenRequest;
@@ -135,5 +136,37 @@ public class UserService {
                 jwtUtil.getExpirationTime(),
                 newRefreshToken,
                 jwtUtil.getRefreshTokenExpirationTime());
+    }
+
+    @Transactional
+    public void logout(String tokenValue) {
+        Token token = tokenRepository.findByToken(tokenValue)
+                .orElseThrow(() -> new IllegalArgumentException("Token not found"));
+
+        token.setRevoked(true);
+        token.setExpired(true);
+        tokenRepository.save(token);
+    }
+
+    @Transactional
+    public void logoutAll(String tokenValue) {
+        // Extract username from token
+        String username = jwtUtil.extractUsername(tokenValue);
+
+        // Ensure user exists
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        // Revoke all tokens
+        List<Token> validTokens = tokenRepository.findAllValidTokensByUser(user.getId());
+        if (validTokens.isEmpty()) {
+            return;
+        }
+
+        validTokens.forEach(t -> {
+            t.setExpired(true);
+            t.setRevoked(true);
+        });
+        tokenRepository.saveAll(validTokens);
     }
 }
