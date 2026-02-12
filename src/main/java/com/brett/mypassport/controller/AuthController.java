@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -106,6 +107,54 @@ public class AuthController {
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.internalServerError().body("Failed to refresh token: " + e.getMessage());
+        }
+    }
+
+    @Operation(summary = "Logout", description = "Invalidates the current access token.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Logout successful"),
+            @ApiResponse(responseCode = "400", description = "Invalid token"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(@RequestHeader(value = "Authorization", required = false) String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.badRequest().body("Token is missing or invalid");
+        }
+
+        String token = authHeader.substring(7);
+        try {
+            userService.logout(token);
+            return ResponseEntity.ok("Logout successful");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body("Logout failed: " + e.getMessage());
+        }
+    }
+
+    @Operation(summary = "Logout All Devices", description = "Invalidates all active tokens for the user.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "All devices logged out successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid token or user not found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    @PostMapping("/logout-all")
+    public ResponseEntity<String> logoutAll(@RequestHeader(value = "Authorization", required = false) String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.badRequest().body("Token is missing or invalid");
+        }
+
+        String token = authHeader.substring(7);
+        try {
+            userService.logoutAll(token);
+            return ResponseEntity.ok("All devices logged out successfully");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body("Logout all failed: " + e.getMessage());
         }
     }
 }
