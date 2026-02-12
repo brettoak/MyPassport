@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestHeader;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -117,7 +118,7 @@ public class AuthController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @PostMapping("/logout")
-    public ResponseEntity<String> logout(@RequestHeader(value = "Authorization", required = false) String authHeader) {
+    public ResponseEntity<String> logout(@Parameter(hidden = true) @RequestHeader(value = "Authorization", required = false) String authHeader) {
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             return ResponseEntity.badRequest().body("Token is missing or invalid");
         }
@@ -141,7 +142,7 @@ public class AuthController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @PostMapping("/logout-all")
-    public ResponseEntity<String> logoutAll(@RequestHeader(value = "Authorization", required = false) String authHeader) {
+    public ResponseEntity<String> logoutAll(@Parameter(hidden = true) @RequestHeader(value = "Authorization", required = false) String authHeader) {
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             return ResponseEntity.badRequest().body("Token is missing or invalid");
         }
