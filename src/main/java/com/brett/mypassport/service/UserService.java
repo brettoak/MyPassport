@@ -143,6 +143,10 @@ public class UserService {
         Token token = tokenRepository.findByToken(tokenValue)
                 .orElseThrow(() -> new IllegalArgumentException("Token not found"));
 
+        if (token.isExpired() || token.isRevoked()) {
+            throw new IllegalArgumentException("Token is already invalid");
+        }
+
         token.setRevoked(true);
         token.setExpired(true);
         tokenRepository.save(token);
