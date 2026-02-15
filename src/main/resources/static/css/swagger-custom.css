@@ -1,0 +1,94 @@
+/* Dark Mode Variables */
+:root {
+  --dark-bg: #1b1b1b;
+  --dark-text: #e0e0e0;
+  --dark-header-bg: #2d2d2d;
+  --dark-block-bg: #2d2d2d;
+  --dark-border: #444;
+  --dark-accent: #89bf04;
+}
+
+body.dark-mode {
+  background-color: var(--dark-bg);
+  color: var(--dark-text);
+}
+
+body.dark-mode .swagger-ui .topbar {
+  background-color: var(--dark-header-bg);
+}
+
+body.dark-mode .swagger-ui .info .title,
+body.dark-mode .swagger-ui .info h1,
+body.dark-mode .swagger-ui .info h2,
+body.dark-mode .swagger-ui .info h3,
+body.dark-mode .swagger-ui .info h4,
+body.dark-mode .swagger-ui .info h5 {
+  color: var(--dark-text);
+}
+
+body.dark-mode .swagger-ui .scheme-container {
+  background-color: var(--dark-block-bg);
+  box-shadow: none;
+  border-bottom: 1px solid var(--dark-border);
+}
+
+body.dark-mode .swagger-ui .opblock .opblock-summary-operation-id,
+body.dark-mode .swagger-ui .opblock .opblock-summary-path,
+body.dark-mode .swagger-ui .opblock .opblock-summary-path__deprecated,
+body.dark-mode .swagger-ui .opblock .opblock-summary-description {
+  color: var(--dark-text);
+}
+
+body.dark-mode .swagger-ui .opblock-description-wrapper p,
+body.dark-mode .swagger-ui .opblock-external-docs-wrapper p,
+body.dark-mode .swagger-ui .opblock-title_normal p {
+  color: var(--dark-text);
+}
+
+body.dark-mode .swagger-ui table thead tr th,
+body.dark-mode .swagger-ui table thead tr td {
+  color: var(--dark-text);
+}
+
+body.dark-mode .swagger-ui .response-col_status,
+body.dark-mode .swagger-ui .response-col_links {
+    color: var(--dark-text);
+}
+
+body.dark-mode .swagger-ui .tab li {
+    color: var(--dark-text);
+}
+
+body.dark-mode .swagger-ui .opblock-body pre.microlight {
+    background: var(--dark-block-bg) !important;
+    border-radius: 4px;
+}
+
+body.dark-mode .swagger-ui select {
+    background-color: var(--dark-block-bg);
+    color: var(--dark-text);
+    border: 1px solid var(--dark-border);
+}
+
+
+/* Dark Mode Toggle Button Style */
+#swagger-ui-theme-toggle {
+  margin-left: 20px;
+  padding: 8px 16px;
+  background-color: transparent;
+  border: 1px solid white;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+#swagger-ui-theme-toggle:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode #swagger-ui-theme-toggle {
+    border-color: var(--dark-accent);
+    color: var(--dark-accent);
+}
