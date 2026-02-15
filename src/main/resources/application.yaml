@@ -17,3 +17,9 @@ spring:
 # Common Server Config (can be overridden in profiles)
 server:
   port: 8089
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    custom-css: /css/swagger-custom.css
+    custom-js: /js/swagger-custom.js
