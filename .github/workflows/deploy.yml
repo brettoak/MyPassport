@@ -71,7 +71,12 @@ jobs:
           # Using nohup to keep it running after shell closes
           # Overriding DB configuration with GitHub Secrets
           nohup java -jar \
+            -Dspring.profiles.active=prod \
             -Dspring.datasource.url='${{ secrets.DB_URL }}' \
             -Dspring.datasource.username='${{ secrets.DB_USERNAME }}' \
             -Dspring.datasource.password='${{ secrets.DB_PASSWORD }}' \
+            -DPROD_MAIL_HOST='${{ secrets.PROD_MAIL_HOST }}' \
+            -DPROD_MAIL_PORT='${{ secrets.PROD_MAIL_PORT }}' \
+            -DPROD_MAIL_USERNAME='${{ secrets.PROD_MAIL_USERNAME }}' \
+            -DPROD_MAIL_PASSWORD='${{ secrets.PROD_MAIL_PASSWORD }}' \
             *.jar > ../app.log 2>&1 &
