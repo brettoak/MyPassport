@@ -95,4 +95,7 @@ jobs:
             -DPROD_MAIL_PORT='${{ secrets.PROD_MAIL_PORT }}' \
             -DPROD_MAIL_USERNAME='${{ secrets.PROD_MAIL_USERNAME }}' \
             -DPROD_MAIL_PASSWORD='${{ secrets.PROD_MAIL_PASSWORD }}' \
+            -DPROD_REDIS_HOST='${{ secrets.PROD_REDIS_HOST }}' \
+            -DPROD_REDIS_PORT='${{ secrets.PROD_REDIS_PORT }}' \
+            -DPROD_REDIS_PASSWORD='${{ secrets.PROD_REDIS_PASSWORD }}' \
             *.jar > ../app.log 2>&1 &
