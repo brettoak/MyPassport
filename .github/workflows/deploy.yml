@@ -56,14 +56,28 @@ jobs:
         key: ${{ secrets.SERVER_SSH_KEY }}
         source: "target/*.jar"
         target: "/home/${{ secrets.SERVER_USER }}/app"
-        
-    - name: Restart Application on Server
+
+    - name: Copy Nginx Config
+      uses: appleboy/scp-action@master
+      with:
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USER }}
+        key: ${{ secrets.SERVER_SSH_KEY }}
+        source: "nginx/app.conf"
+        target: "/home/${{ secrets.SERVER_USER }}/app"
+
+    - name: Configure Nginx & Restart App
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.SERVER_HOST }}
         username: ${{ secrets.SERVER_USER }}
         key: ${{ secrets.SERVER_SSH_KEY }}
         script: |
+          # Move Nginx config to the correct location (requires sudo)
+          # Assuming the user has sudo privileges without password or provided via secrets (not handled here, standard assumption for CI/CD user)
+          echo "${{ secrets.SERVER_USER_PASSWORD }}" | sudo -S mv /home/${{ secrets.SERVER_USER }}/app/nginx/app.conf /etc/nginx/conf.d/app.conf
+          echo "${{ secrets.SERVER_USER_PASSWORD }}" | sudo -S nginx -t && echo "${{ secrets.SERVER_USER_PASSWORD }}" | sudo -S nginx -s reload
+
           # Navigate to the deployment directory
           cd /home/${{ secrets.SERVER_USER }}/app/target
           
