@@ -45,8 +45,8 @@ jobs:
         username: ${{ secrets.SERVER_USER }}
         key: ${{ secrets.SERVER_SSH_KEY }}
         script: |
-          # Stop the existing application
-          fuser -k 8089/tcp || true
+          # Stop the existing application (assuming port 8080 based on application-prod.yaml)
+          fuser -k 8080/tcp || true
           # Remove old artifacts to avoid version conflicts
           rm -rf /home/${{ secrets.SERVER_USER }}/app/target
 
