@@ -255,4 +255,25 @@ public class UserService implements UserDetailsService {
         // 5. Optionally revoke all tokens (security best practice)
         // revokeAllUserTokens(user); // If we had this method exposed/implemented easily here
     }
+
+    @Transactional
+    public void changePassword(String username, com.brett.mypassport.dto.ChangePasswordRequest request) {
+        // 1. Find user
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        // 2. Validate old password
+        if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("Invalid old password");
+        }
+
+        // 3. Validate new passwords match
+        if (request.getNewPassword() == null || !request.getNewPassword().equals(request.getConfirmPassword())) {
+            throw new IllegalArgumentException("New passwords do not match");
+        }
+
+        // 4. Update password
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+    }
 }
