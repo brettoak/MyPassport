@@ -32,15 +32,10 @@ public class UserController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @GetMapping("/profile")
-    public ResponseEntity<?> getUserProfile(@AuthenticationPrincipal UserDetails userDetails) {
+    public UserResponse getUserProfile(@AuthenticationPrincipal UserDetails userDetails) {
         if (userDetails == null) {
-            return ResponseEntity.status(403).body("User not authenticated");
+            throw new org.springframework.security.access.AccessDeniedException("User not authenticated");
         }
-        try {
-            UserResponse response = userService.getUserProfile(userDetails.getUsername());
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("Failed to fetch profile: " + e.getMessage());
-        }
+        return userService.getUserProfile(userDetails.getUsername());
     }
 }
