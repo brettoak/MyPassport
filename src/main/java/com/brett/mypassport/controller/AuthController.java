@@ -5,6 +5,7 @@ import com.brett.mypassport.dto.LoginRequest;
 import com.brett.mypassport.dto.LoginResponse;
 import com.brett.mypassport.dto.RefreshTokenRequest;
 import com.brett.mypassport.dto.RegisterRequest;
+import com.brett.mypassport.dto.ResetPasswordRequest;
 import com.brett.mypassport.dto.VerificationRequest;
 import com.brett.mypassport.service.UserService;
 import com.brett.mypassport.service.VerificationService;
@@ -156,6 +157,46 @@ public class AuthController {
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.internalServerError().body("Logout all failed: " + e.getMessage());
+        }
+    }
+
+    @Operation(summary = "Forgot Password", description = "Sends a verification code to the user's email if the account exists.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Verification code sent successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid email or user not found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    @PostMapping("/forgot-password")
+    public ResponseEntity<String> forgotPassword(@RequestBody VerificationRequest request) {
+        if (request.getEmail() == null || request.getEmail().isEmpty()) {
+            return ResponseEntity.badRequest().body("Email cannot be empty");
+        }
+
+        try {
+            userService.requestPasswordReset(request.getEmail());
+            return ResponseEntity.ok("Verification code sent successfully.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Failed to send code: " + e.getMessage());
+        }
+    }
+
+    @Operation(summary = "Reset Password", description = "Resets the user's password using a valid verification code.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Password reset successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid code or user not found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(@RequestBody ResetPasswordRequest request) {
+        try {
+            userService.resetPassword(request);
+            return ResponseEntity.ok("Password reset successfully.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Failed to reset password: " + e.getMessage());
         }
     }
 }
