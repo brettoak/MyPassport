@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestHeader;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import com.brett.mypassport.dto.DeviceResponse;
 import org.springframework.core.annotation.Order;
@@ -72,10 +73,11 @@ public class UserController {
     })
     @Order(12)
     @GetMapping("/devices")
-    public List<DeviceResponse> getActiveDevices(@AuthenticationPrincipal UserDetails userDetails, @RequestHeader("Authorization") String token) {
+    public List<DeviceResponse> getActiveDevices(@AuthenticationPrincipal UserDetails userDetails, HttpServletRequest request) {
         if (userDetails == null) {
             throw new org.springframework.security.access.AccessDeniedException("User not authenticated");
         }
+        String token = request.getHeader("Authorization");
         return userService.getActiveDevices(userDetails.getUsername(), token);
     }
 }
