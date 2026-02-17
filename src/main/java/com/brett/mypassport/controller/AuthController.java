@@ -15,7 +15,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.core.annotation.Order;
 
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Operation;
@@ -40,6 +42,7 @@ public class AuthController {
             @ApiResponse(responseCode = "400", description = "Invalid email provided"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
+    @Order(2)
     @PostMapping("/send-code")
     public String sendCode(@RequestBody VerificationRequest request) {
         if (request.getEmail() == null || request.getEmail().isEmpty()) {
@@ -56,6 +59,7 @@ public class AuthController {
             @ApiResponse(responseCode = "400", description = "Invalid input or verification code"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
+    @Order(3)
     @PostMapping("/register")
     public String register(@RequestBody RegisterRequest request) {
         userService.registerUser(request);
@@ -68,6 +72,7 @@ public class AuthController {
             @ApiResponse(responseCode = "401", description = "Invalid credentials"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
+    @Order(1)
     @PostMapping("/login")
     public LoginResponse login(@RequestBody LoginRequest request) {
         return userService.login(request);
@@ -79,6 +84,7 @@ public class AuthController {
             @ApiResponse(responseCode = "400", description = "Invalid or expired refresh token"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
+    @Order(6)
     @PostMapping("/refresh-token")
     public LoginResponse refreshToken(@RequestBody RefreshTokenRequest request) {
         return userService.refreshToken(request);
@@ -90,6 +96,7 @@ public class AuthController {
             @ApiResponse(responseCode = "400", description = "Invalid token"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
+    @Order(7)
     @PostMapping("/logout")
     public String logout(@Parameter(hidden = true) @RequestHeader(value = "Authorization", required = false) String authHeader) {
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
@@ -107,6 +114,7 @@ public class AuthController {
             @ApiResponse(responseCode = "400", description = "Invalid token or user not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
+    @Order(8)
     @PostMapping("/logout-all")
     public String logoutAll(@Parameter(hidden = true) @RequestHeader(value = "Authorization", required = false) String authHeader) {
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
@@ -124,6 +132,7 @@ public class AuthController {
             @ApiResponse(responseCode = "400", description = "Invalid email or user not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
+    @Order(4)
     @PostMapping("/forgot-password")
     public String forgotPassword(@RequestBody VerificationRequest request) {
         if (request.getEmail() == null || request.getEmail().isEmpty()) {
@@ -140,6 +149,7 @@ public class AuthController {
             @ApiResponse(responseCode = "400", description = "Invalid code or user not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
+    @Order(5)
     @PostMapping("/reset-password")
     public String resetPassword(@RequestBody ResetPasswordRequest request) {
         userService.resetPassword(request);

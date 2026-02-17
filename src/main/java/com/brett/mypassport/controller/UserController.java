@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.core.annotation.Order;
 
 @RestController
 @RequestMapping(ApiConstants.API_V1 + "/users")
@@ -33,6 +34,7 @@ public class UserController {
             @ApiResponse(responseCode = "403", description = "Unauthorized access"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
+    @Order(10)
     @GetMapping("/profile")
     public UserResponse getUserProfile(@AuthenticationPrincipal UserDetails userDetails) {
         if (userDetails == null) {
@@ -48,6 +50,7 @@ public class UserController {
             @ApiResponse(responseCode = "400", description = "Invalid old password or mismatching new passwords"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
+    @Order(11)
     @PostMapping("/change-password")
     public String changePassword(@AuthenticationPrincipal UserDetails userDetails, @RequestBody com.brett.mypassport.dto.ChangePasswordRequest request) {
         if (userDetails == null) {
