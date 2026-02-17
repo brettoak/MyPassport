@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestHeader;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.core.annotation.Order;
 
 import io.swagger.v3.oas.annotations.Parameter;
@@ -74,8 +75,10 @@ public class AuthController {
     })
     @Order(1)
     @PostMapping("/login")
-    public LoginResponse login(@RequestBody LoginRequest request) {
-        return userService.login(request);
+    public LoginResponse login(@RequestBody LoginRequest request, HttpServletRequest httpRequest) {
+        String ipAddress = httpRequest.getRemoteAddr();
+        String deviceInfo = httpRequest.getHeader("User-Agent");
+        return userService.login(request, ipAddress, deviceInfo);
     }
 
     @Operation(summary = "Refresh Token", description = "Generates a new access token and refresh token using a valid refresh token.")

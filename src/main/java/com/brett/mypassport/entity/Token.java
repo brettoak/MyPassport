@@ -20,6 +20,12 @@ public class Token {
     @Column(name = "token_type")
     private String tokenType = "BEARER";
 
+    @Column(name = "ip_address")
+    private String ipAddress;
+
+    @Column(name = "device_info")
+    private String deviceInfo;
+
     private boolean revoked;
 
     private boolean expired;
@@ -113,5 +119,25 @@ public class Token {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public String getIpAddress() {
+        return ipAddress;
+    }
+
+    public void setIpAddress(String ipAddress) {
+        this.ipAddress = ipAddress;
+    }
+
+    public String getDeviceInfo() {
+        return deviceInfo;
+    }
+
+    public void setDeviceInfo(String deviceInfo) {
+        this.deviceInfo = deviceInfo;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 }

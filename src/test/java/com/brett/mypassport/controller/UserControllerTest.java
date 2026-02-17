@@ -1,9 +1,12 @@
 package com.brett.mypassport.controller;
 
 import com.brett.mypassport.dto.ChangePasswordRequest;
+import com.brett.mypassport.dto.DeviceResponse;
 import com.brett.mypassport.dto.UserResponse;
 import com.brett.mypassport.service.UserService;
 import com.brett.mypassport.common.JwtUtil;
+import java.util.Arrays;
+import java.util.List;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +17,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
@@ -82,6 +86,24 @@ public class UserControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data").value("Password changed successfully"));
+    }
+
+    @Test
+    @WithMockUser(username = "testuser")
+    public void testGetActiveDevices() throws Exception {
+        DeviceResponse device1 = new DeviceResponse("127.0.0.1", "Chrome", LocalDateTime.now(), true);
+        DeviceResponse device2 = new DeviceResponse("192.168.1.5", "Firefox", LocalDateTime.now(), false);
+        List<DeviceResponse> devices = Arrays.asList(device1, device2);
+
+        when(userService.getActiveDevices(eq("testuser"), anyString())).thenReturn(devices);
+
+        mockMvc.perform(get("/api/v1/users/devices")
+                .header("Authorization", "Bearer fake-token"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200))
+                .andExpect(jsonPath("$.data[0].ipAddress").value("127.0.0.1"))
+                .andExpect(jsonPath("$.data[0].current").value(true))
+                .andExpect(jsonPath("$.data[1].deviceInfo").value("Firefox"));
     }
 
     @Test

@@ -40,7 +40,7 @@ public class UserService implements UserDetailsService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public LoginResponse login(LoginRequest request) {
+    public LoginResponse login(LoginRequest request, String ipAddress, String deviceInfo) {
         // 1. Find user by email (or username, logic can be added)
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid email or password."));
@@ -55,7 +55,7 @@ public class UserService implements UserDetailsService {
         String refreshToken = jwtUtil.generateRefreshToken(user.getUsername());
 
         // 4. Save Token
-        saveUserToken(user, jwtToken, refreshToken);
+        saveUserToken(user, jwtToken, refreshToken, ipAddress, deviceInfo);
 
         // 5. Return Response
         return new LoginResponse(
@@ -67,7 +67,7 @@ public class UserService implements UserDetailsService {
                 jwtUtil.getRefreshTokenExpirationTime());
     }
 
-    private void saveUserToken(User user, String jwtToken, String refreshToken) {
+    private void saveUserToken(User user, String jwtToken, String refreshToken, String ipAddress, String deviceInfo) {
         // Option: Revoke old tokens here if needed
         Token token = new Token();
         token.setUser(user);
@@ -76,6 +76,8 @@ public class UserService implements UserDetailsService {
         token.setTokenType("BEARER");
         token.setExpired(false);
         token.setRevoked(false);
+        token.setIpAddress(ipAddress);
+        token.setDeviceInfo(deviceInfo);
         tokenRepository.save(token);
     }
 
@@ -133,7 +135,7 @@ public class UserService implements UserDetailsService {
         String newRefreshToken = jwtUtil.generateRefreshToken(user.getUsername());
 
         // 6. Save new token
-        saveUserToken(user, newJwtToken, newRefreshToken);
+        saveUserToken(user, newJwtToken, newRefreshToken, null, null);
 
         // 7. Return Response
         return new LoginResponse(
@@ -275,5 +277,22 @@ public class UserService implements UserDetailsService {
         // 4. Update password
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);
+    }
+
+    public List<com.brett.mypassport.dto.DeviceResponse> getActiveDevices(String username, String currentToken) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        
+        // Remove "Bearer " if present to match stored token
+        String tokenValue = currentToken.startsWith("Bearer ") ? currentToken.substring(7) : currentToken;
+
+        return tokenRepository.findAllValidTokensByUser(user.getId()).stream()
+                .map(token -> new com.brett.mypassport.dto.DeviceResponse(
+                        token.getIpAddress(),
+                        token.getDeviceInfo(),
+                        token.getCreatedAt(), // Assuming created_at is strictly when session started. Ideally last_used.
+                        token.getToken().equals(tokenValue)
+                ))
+                .collect(java.util.stream.Collectors.toList());
     }
 }

@@ -61,7 +61,7 @@ public class AuthControllerTest {
                                 "fake-refresh-token",
                                 604800000L);
 
-                when(userService.login(any(LoginRequest.class))).thenReturn(loginResponse);
+                when(userService.login(any(LoginRequest.class), any(), any())).thenReturn(loginResponse);
 
                 mockMvc.perform(post("/api/v1/auth/login")
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -78,7 +78,7 @@ public class AuthControllerTest {
                 loginRequest.setEmail("test@example.com");
                 loginRequest.setPassword("wrongpassword");
 
-                when(userService.login(any(LoginRequest.class)))
+                when(userService.login(any(LoginRequest.class), any(), any()))
                                 .thenThrow(new IllegalArgumentException("Invalid email or password."));
 
                 mockMvc.perform(post("/api/v1/auth/login")

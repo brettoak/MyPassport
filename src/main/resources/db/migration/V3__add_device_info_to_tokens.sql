@@ -1,0 +1,3 @@
+ALTER TABLE tokens
+ADD COLUMN ip_address VARCHAR(45),
+ADD COLUMN device_info VARCHAR(255);

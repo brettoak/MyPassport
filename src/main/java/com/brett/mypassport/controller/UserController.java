@@ -17,6 +17,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestHeader;
+import java.util.List;
+import com.brett.mypassport.dto.DeviceResponse;
 import org.springframework.core.annotation.Order;
 
 @RestController
@@ -58,5 +61,21 @@ public class UserController {
         }
         userService.changePassword(userDetails.getUsername(), request);
         return "Password changed successfully";
+    }
+
+    @Operation(summary = "Get Active Devices", description = "Retrieves a list of active devices (sessions) for the user.")
+    @SecurityRequirement(name = "bearerAuth")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "List of devices retrieved successfully"),
+            @ApiResponse(responseCode = "403", description = "Unauthorized access"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    @Order(12)
+    @GetMapping("/devices")
+    public List<DeviceResponse> getActiveDevices(@AuthenticationPrincipal UserDetails userDetails, @RequestHeader("Authorization") String token) {
+        if (userDetails == null) {
+            throw new org.springframework.security.access.AccessDeniedException("User not authenticated");
+        }
+        return userService.getActiveDevices(userDetails.getUsername(), token);
     }
 }
