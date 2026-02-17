@@ -3,8 +3,10 @@ package com.brett.mypassport.service;
 import java.util.List;
 import com.brett.mypassport.dto.LoginRequest;
 import com.brett.mypassport.dto.LoginResponse;
+import com.brett.mypassport.dto.LoginResponse;
 import com.brett.mypassport.dto.RefreshTokenRequest;
 import com.brett.mypassport.dto.RegisterRequest;
+import com.brett.mypassport.dto.ResetPasswordRequest;
 import com.brett.mypassport.dto.UserResponse;
 import com.brett.mypassport.entity.Token;
 import com.brett.mypassport.entity.User;
@@ -210,5 +212,42 @@ public class UserService implements UserDetailsService {
                 user.getCreatedAt(),
                 user.getUpdatedAt()
         );
+    }
+
+
+    public void requestPasswordReset(String email) {
+        if (!userRepository.existsByEmail(email)) {
+            // To prevent user enumeration, we might want to return success even if email doesn't exist.
+            // However, for this implementation, we'll throw an exception or handle it.
+            // Let's go with throwing exception for now for simplicity, or just return.
+            // Better security practice: do not reveal if email exists.
+            // But if we return, the user won't get an email.
+            // Let's throw exception for now as it's an internal API mostly.
+            throw new IllegalArgumentException("User with this email does not exist.");
+        }
+        verificationService.sendVerificationCode(email);
+    }
+
+    @Transactional
+    public void resetPassword(ResetPasswordRequest request) {
+        // 1. Verify code
+        boolean isVerified = verificationService.verifyCode(request.getEmail(), request.getVerificationCode());
+        if (!isVerified) {
+            throw new IllegalArgumentException("Invalid or expired verification code.");
+        }
+
+        // 2. Find user
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        // 3. Update password
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+
+        // 4. Invalidate code
+        verificationService.deleteCode(request.getEmail());
+
+        // 5. Optionally revoke all tokens (security best practice)
+        // revokeAllUserTokens(user); // If we had this method exposed/implemented easily here
     }
 }

@@ -39,4 +39,8 @@ public class VerificationService {
         int code = 100000 + random.nextInt(900000);
         return String.valueOf(code);
     }
+
+    public void deleteCode(String email) {
+        redisTemplate.delete(KEY_PREFIX + email);
+    }
 }
