@@ -67,8 +67,9 @@ public class AuthControllerTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(loginRequest)))
                                 .andExpect(status().isOk())
-                                .andExpect(jsonPath("$.token").value("fake-jwt-token"))
-                                .andExpect(jsonPath("$.username").value("testuser"));
+                                .andExpect(jsonPath("$.code").value(200))
+                                .andExpect(jsonPath("$.data.token").value("fake-jwt-token"))
+                                .andExpect(jsonPath("$.data.username").value("testuser"));
         }
 
         @Test
@@ -83,8 +84,9 @@ public class AuthControllerTest {
                 mockMvc.perform(post("/api/v1/auth/login")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(loginRequest)))
-                                .andExpect(status().isUnauthorized())
-                                .andExpect(jsonPath("$").value("Invalid email or password."));
+                                .andExpect(status().isBadRequest())
+                                .andExpect(jsonPath("$.code").value(400))
+                                .andExpect(jsonPath("$.message").value("Invalid email or password."));
         }
 
 
@@ -99,7 +101,8 @@ public class AuthControllerTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                                 .andExpect(status().isOk())
-                                .andExpect(jsonPath("$").value("Verification code sent successfully."));
+                                .andExpect(jsonPath("$.code").value(200))
+                                .andExpect(jsonPath("$.data").value("Verification code sent successfully."));
         }
 
         @Test
@@ -116,7 +119,8 @@ public class AuthControllerTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                                 .andExpect(status().isOk())
-                                .andExpect(jsonPath("$").value("Password reset successfully."));
+                                .andExpect(jsonPath("$.code").value(200))
+                                .andExpect(jsonPath("$.data").value("Password reset successfully."));
         }
 
         @Test
@@ -133,6 +137,7 @@ public class AuthControllerTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                                 .andExpect(status().isBadRequest())
-                                .andExpect(jsonPath("$").value("Passwords do not match."));
+                                .andExpect(jsonPath("$.code").value(400))
+                                .andExpect(jsonPath("$.message").value("Passwords do not match."));
         }
 }
