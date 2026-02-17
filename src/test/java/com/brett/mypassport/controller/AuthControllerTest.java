@@ -13,7 +13,13 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.brett.mypassport.dto.ResetPasswordRequest;
+import com.brett.mypassport.dto.VerificationRequest;
+
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -79,5 +85,36 @@ public class AuthControllerTest {
                                 .content(objectMapper.writeValueAsString(loginRequest)))
                                 .andExpect(status().isUnauthorized())
                                 .andExpect(jsonPath("$").value("Invalid email or password."));
+        }
+
+
+        @Test
+        public void testForgotPasswordSuccess() throws Exception {
+                VerificationRequest request = new VerificationRequest();
+                request.setEmail("test@example.com");
+
+                doNothing().when(userService).requestPasswordReset(anyString());
+
+                mockMvc.perform(post("/api/v1/auth/forgot-password")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$").value("Verification code sent successfully."));
+        }
+
+        @Test
+        public void testResetPasswordSuccess() throws Exception {
+                ResetPasswordRequest request = new ResetPasswordRequest();
+                request.setEmail("test@example.com");
+                request.setVerificationCode("123456");
+                request.setNewPassword("newpassword");
+
+                doNothing().when(userService).resetPassword(any(ResetPasswordRequest.class));
+
+                mockMvc.perform(post("/api/v1/auth/reset-password")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$").value("Password reset successfully."));
         }
 }
