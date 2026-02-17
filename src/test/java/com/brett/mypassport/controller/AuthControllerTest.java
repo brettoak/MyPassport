@@ -35,6 +35,9 @@ public class AuthControllerTest {
         @MockBean
         private VerificationService verificationService; // Required because AuthController injects it
 
+        @MockBean
+        private JwtUtil jwtUtil;
+
         @Autowired
         private ObjectMapper objectMapper;
 
