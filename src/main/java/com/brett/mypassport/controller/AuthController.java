@@ -41,18 +41,13 @@ public class AuthController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @PostMapping("/send-code")
-    public ResponseEntity<String> sendCode(@RequestBody VerificationRequest request) {
+    public String sendCode(@RequestBody VerificationRequest request) {
         if (request.getEmail() == null || request.getEmail().isEmpty()) {
-            return ResponseEntity.badRequest().body("Email cannot be empty");
+            throw new IllegalArgumentException("Email cannot be empty");
         }
 
-        try {
-            verificationService.sendVerificationCode(request.getEmail());
-            return ResponseEntity.ok("Verification code sent successfully.");
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.internalServerError().body("Failed to send code: " + e.getMessage());
-        }
+        verificationService.sendVerificationCode(request.getEmail());
+        return "Verification code sent successfully.";
     }
 
     @Operation(summary = "Register User", description = "Registers a new user. Requires a valid verification code sent to the email.")
@@ -62,16 +57,9 @@ public class AuthController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody RegisterRequest request) {
-        try {
-            userService.registerUser(request);
-            return ResponseEntity.ok("User registered successfully.");
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.internalServerError().body("Failed to register user: " + e.getMessage());
-        }
+    public String register(@RequestBody RegisterRequest request) {
+        userService.registerUser(request);
+        return "User registered successfully.";
     }
 
     @Operation(summary = "Login User", description = "Authenticates a user and returns a JWT token.")
@@ -81,16 +69,8 @@ public class AuthController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
-        try {
-            LoginResponse response = userService.login(request);
-            return ResponseEntity.ok(response);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(401).body(e.getMessage());
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.internalServerError().body("Failed to login: " + e.getMessage());
-        }
+    public LoginResponse login(@RequestBody LoginRequest request) {
+        return userService.login(request);
     }
 
     @Operation(summary = "Refresh Token", description = "Generates a new access token and refresh token using a valid refresh token.")
@@ -100,16 +80,8 @@ public class AuthController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @PostMapping("/refresh-token")
-    public ResponseEntity<?> refreshToken(@RequestBody RefreshTokenRequest request) {
-        try {
-            LoginResponse response = userService.refreshToken(request);
-            return ResponseEntity.ok(response);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.internalServerError().body("Failed to refresh token: " + e.getMessage());
-        }
+    public LoginResponse refreshToken(@RequestBody RefreshTokenRequest request) {
+        return userService.refreshToken(request);
     }
 
     @Operation(summary = "Logout", description = "Invalidates the current access token.")
@@ -119,21 +91,14 @@ public class AuthController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @PostMapping("/logout")
-    public ResponseEntity<String> logout(@Parameter(hidden = true) @RequestHeader(value = "Authorization", required = false) String authHeader) {
+    public String logout(@Parameter(hidden = true) @RequestHeader(value = "Authorization", required = false) String authHeader) {
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return ResponseEntity.badRequest().body("Token is missing or invalid");
+            throw new IllegalArgumentException("Token is missing or invalid");
         }
 
         String token = authHeader.substring(7);
-        try {
-            userService.logout(token);
-            return ResponseEntity.ok("Logout successful");
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.internalServerError().body("Logout failed: " + e.getMessage());
-        }
+        userService.logout(token);
+        return "Logout successful";
     }
 
     @Operation(summary = "Logout All Devices", description = "Invalidates all active tokens for the user.")
@@ -143,21 +108,14 @@ public class AuthController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @PostMapping("/logout-all")
-    public ResponseEntity<String> logoutAll(@Parameter(hidden = true) @RequestHeader(value = "Authorization", required = false) String authHeader) {
+    public String logoutAll(@Parameter(hidden = true) @RequestHeader(value = "Authorization", required = false) String authHeader) {
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return ResponseEntity.badRequest().body("Token is missing or invalid");
+            throw new IllegalArgumentException("Token is missing or invalid");
         }
 
         String token = authHeader.substring(7);
-        try {
-            userService.logoutAll(token);
-            return ResponseEntity.ok("All devices logged out successfully");
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.internalServerError().body("Logout all failed: " + e.getMessage());
-        }
+        userService.logoutAll(token);
+        return "All devices logged out successfully";
     }
 
     @Operation(summary = "Forgot Password", description = "Sends a verification code to the user's email if the account exists.")
@@ -167,19 +125,13 @@ public class AuthController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @PostMapping("/forgot-password")
-    public ResponseEntity<String> forgotPassword(@RequestBody VerificationRequest request) {
+    public String forgotPassword(@RequestBody VerificationRequest request) {
         if (request.getEmail() == null || request.getEmail().isEmpty()) {
-            return ResponseEntity.badRequest().body("Email cannot be empty");
+            throw new IllegalArgumentException("Email cannot be empty");
         }
 
-        try {
-            userService.requestPasswordReset(request.getEmail());
-            return ResponseEntity.ok("Verification code sent successfully.");
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("Failed to send code: " + e.getMessage());
-        }
+        userService.requestPasswordReset(request.getEmail());
+        return "Verification code sent successfully.";
     }
 
     @Operation(summary = "Reset Password", description = "Resets the user's password using a valid verification code.")
@@ -189,14 +141,8 @@ public class AuthController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @PostMapping("/reset-password")
-    public ResponseEntity<String> resetPassword(@RequestBody ResetPasswordRequest request) {
-        try {
-            userService.resetPassword(request);
-            return ResponseEntity.ok("Password reset successfully.");
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("Failed to reset password: " + e.getMessage());
-        }
+    public String resetPassword(@RequestBody ResetPasswordRequest request) {
+        userService.resetPassword(request);
+        return "Password reset successfully.";
     }
 }
