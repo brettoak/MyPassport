@@ -236,6 +236,11 @@ public class UserService implements UserDetailsService {
             throw new IllegalArgumentException("Invalid or expired verification code.");
         }
 
+        // 2. Verify passwords match
+        if (request.getNewPassword() == null || !request.getNewPassword().equals(request.getConfirmPassword())) {
+            throw new IllegalArgumentException("Passwords do not match.");
+        }
+
         // 2. Find user
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));

@@ -108,6 +108,7 @@ public class AuthControllerTest {
                 request.setEmail("test@example.com");
                 request.setVerificationCode("123456");
                 request.setNewPassword("newpassword");
+                request.setConfirmPassword("newpassword");
 
                 doNothing().when(userService).resetPassword(any(ResetPasswordRequest.class));
 
@@ -116,5 +117,22 @@ public class AuthControllerTest {
                                 .content(objectMapper.writeValueAsString(request)))
                                 .andExpect(status().isOk())
                                 .andExpect(jsonPath("$").value("Password reset successfully."));
+        }
+
+        @Test
+        public void testResetPasswordMismatch() throws Exception {
+                ResetPasswordRequest request = new ResetPasswordRequest();
+                request.setEmail("test@example.com");
+                request.setVerificationCode("123456");
+                request.setNewPassword("newpassword");
+                request.setConfirmPassword("mismatch");
+
+                doThrow(new IllegalArgumentException("Passwords do not match.")).when(userService).resetPassword(any(ResetPasswordRequest.class));
+
+                mockMvc.perform(post("/api/v1/auth/reset-password")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
+                                .andExpect(status().isBadRequest())
+                                .andExpect(jsonPath("$").value("Passwords do not match."));
         }
 }

@@ -14,6 +14,9 @@ public class ResetPasswordRequest {
     @Schema(description = "New password", example = "NewPassword123!")
     private String newPassword;
 
+    @Schema(description = "Confirmation of new password", example = "NewPassword123!")
+    private String confirmPassword;
+
     public String getEmail() {
         return email;
     }
@@ -36,5 +39,13 @@ public class ResetPasswordRequest {
 
     public void setNewPassword(String newPassword) {
         this.newPassword = newPassword;
+    }
+
+    public String getConfirmPassword() {
+        return confirmPassword;
+    }
+
+    public void setConfirmPassword(String confirmPassword) {
+        this.confirmPassword = confirmPassword;
     }
 }
