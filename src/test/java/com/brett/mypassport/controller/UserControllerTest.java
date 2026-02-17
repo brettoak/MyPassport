@@ -53,7 +53,7 @@ public class UserControllerTest {
 
         when(userService.getUserProfile("testuser")).thenReturn(mockResponse);
 
-        mockMvc.perform(get("/api/v1/profile"))
+        mockMvc.perform(get("/api/v1/users/profile"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data.username").value("testuser"));
@@ -61,7 +61,7 @@ public class UserControllerTest {
 
     @Test
     public void testGetUserProfileUnauthenticated() throws Exception {
-        mockMvc.perform(get("/api/v1/profile"))
+        mockMvc.perform(get("/api/v1/users/profile"))
                 .andExpect(status().isForbidden()); // SecurityConfig denies access
     }
 

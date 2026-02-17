@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(ApiConstants.API_V1)
+@RequestMapping(ApiConstants.API_V1 + "/users")
 @Tag(name = "User", description = "APIs for user management")
 public class UserController {
 
@@ -48,7 +48,7 @@ public class UserController {
             @ApiResponse(responseCode = "400", description = "Invalid old password or mismatching new passwords"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    @PostMapping("/users/change-password")
+    @PostMapping("/change-password")
     public String changePassword(@AuthenticationPrincipal UserDetails userDetails, @RequestBody com.brett.mypassport.dto.ChangePasswordRequest request) {
         if (userDetails == null) {
             throw new org.springframework.security.access.AccessDeniedException("User not authenticated");
