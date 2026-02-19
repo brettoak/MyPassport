@@ -92,11 +92,12 @@ public class UserController {
     })
     @Order(13)
     @DeleteMapping("/devices/{tokenId}")
-    public String kickDevice(@AuthenticationPrincipal UserDetails userDetails, @PathVariable Long tokenId) {
+    public String kickDevice(@AuthenticationPrincipal UserDetails userDetails, @PathVariable Long tokenId, HttpServletRequest request) {
         if (userDetails == null) {
             throw new org.springframework.security.access.AccessDeniedException("User not authenticated");
         }
-        userService.revokeDevice(tokenId, userDetails.getUsername());
+        String token = request.getHeader("Authorization");
+        userService.revokeDevice(tokenId, userDetails.getUsername(), token);
         return "Device kicked successfully";
     }
 }

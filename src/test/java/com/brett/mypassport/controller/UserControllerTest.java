@@ -24,7 +24,10 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -124,5 +127,21 @@ public class UserControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value(400))
                 .andExpect(jsonPath("$.message").value("New passwords do not match"));
+    }
+
+    @Test
+    @WithMockUser(username = "testuser")
+    public void testKickDeviceSuccess() throws Exception {
+        Long tokenId = 123L;
+        String token = "Bearer valid-token";
+
+        doNothing().when(userService).revokeDevice(eq(tokenId), eq("testuser"), eq(token));
+
+        mockMvc.perform(delete("/api/v1/users/devices/{tokenId}", tokenId)
+                .header("Authorization", token)
+                .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200))
+                .andExpect(jsonPath("$.data").value("Device kicked successfully"));
     }
 }

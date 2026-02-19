@@ -317,17 +317,26 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional
-    public void revokeDevice(Long tokenId, String username) {
-        // 1. Find the token
+    public void revokeDevice(Long tokenId, String username, String currentToken) {
+        // 1. Validate current token
+        String tokenValue = currentToken.startsWith("Bearer ") ? currentToken.substring(7) : currentToken;
+        Token initiatingToken = tokenRepository.findByToken(tokenValue)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid token"));
+
+        if (initiatingToken.isRevoked() || initiatingToken.isExpired()) {
+             throw new IllegalArgumentException("Token is already invalid");
+        }
+
+        // 2. Find the target token
         Token token = tokenRepository.findById(tokenId)
                 .orElseThrow(() -> new IllegalArgumentException("Device/Token not found"));
 
-        // 2. Ensure it belongs to the user
+        // 3. Ensure it belongs to the user
         if (!token.getUser().getUsername().equals(username)) {
             throw new IllegalArgumentException("Unauthorized action");
         }
 
-        // 3. Revoke
+        // 4. Revoke
         token.setRevoked(true);
         token.setExpired(true);
         tokenRepository.save(token);
