@@ -9,6 +9,11 @@ import com.brett.mypassport.dto.ResetPasswordRequest;
 import com.brett.mypassport.dto.VerificationRequest;
 import com.brett.mypassport.service.UserService;
 import com.brett.mypassport.service.VerificationService;
+import com.brett.mypassport.config.RsaKeyProperties;
+import java.security.interfaces.RSAPublicKey;
+import java.util.Base64;
+import java.util.Map;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -36,6 +41,19 @@ public class AuthController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private RsaKeyProperties rsaKeyProperties;
+
+    @Operation(summary = "Get Public Key", description = "Returns the RSA Public Key for token verification.")
+    @GetMapping("/public-key")
+    public Map<String, String> getPublicKey() {
+        RSAPublicKey publicKey = rsaKeyProperties.getPublicKey();
+        String publicKeyPEM = "-----BEGIN PUBLIC KEY-----\n" +
+                Base64.getEncoder().encodeToString(publicKey.getEncoded()) +
+                "\n-----END PUBLIC KEY-----";
+        return Map.of("algorithm", "RS256", "publicKey", publicKeyPEM);
+    }
 
     @Operation(summary = "Send Verification Code", description = "Generates a verification code and sends it to the provided email address. The code expires in 60 seconds.")
     @ApiResponses(value = {

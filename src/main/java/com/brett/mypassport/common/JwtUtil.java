@@ -1,12 +1,12 @@
 package com.brett.mypassport.common;
 
+import com.brett.mypassport.config.RsaKeyProperties;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -15,12 +15,11 @@ import java.util.function.Function;
 @Component
 public class JwtUtil {
 
-    // Ideally, store this in application.yaml
-    private static final String SECRET_KEY = "mySuperSecretKeyForJwtSigningWhichShouldBeVeryLongAndSecure";
+    @Autowired
+    private RsaKeyProperties rsaKeyProperties;
+
     private static final long EXPIRATION_TIME = 1000 * 60 * 60 * 2; // 2 hours
     private static final long REFRESH_EXPIRATION_TIME = 1000 * 60 * 60 * 24; // 1 day
-
-    private final Key key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
 
     public String generateToken(String username) {
         return createToken(new HashMap<>(), username, EXPIRATION_TIME);
@@ -36,7 +35,7 @@ public class JwtUtil {
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
-                .signWith(key, SignatureAlgorithm.HS256)
+                .signWith(rsaKeyProperties.getPrivateKey(), SignatureAlgorithm.RS256)
                 .compact();
     }
 
@@ -67,7 +66,11 @@ public class JwtUtil {
     }
 
     private Claims extractAllClaims(String token) {
-        return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
+        return Jwts.parserBuilder()
+                .setSigningKey(rsaKeyProperties.getPublicKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
     }
 
     private Boolean isTokenExpired(String token) {
