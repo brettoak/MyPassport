@@ -307,12 +307,30 @@ public class UserService implements UserDetailsService {
 
         return tokenRepository.findAllValidTokensByUser(user.getId()).stream()
                 .map(token -> new com.brett.mypassport.dto.DeviceResponse(
+                        token.getId(),
                         token.getIpAddress(),
                         token.getDeviceInfo(),
                         token.getCreatedAt(), // Assuming created_at is strictly when session started. Ideally last_used.
                         token.getToken().equals(tokenValue)
                 ))
                 .collect(java.util.stream.Collectors.toList());
+    }
+
+    @Transactional
+    public void revokeDevice(Long tokenId, String username) {
+        // 1. Find the token
+        Token token = tokenRepository.findById(tokenId)
+                .orElseThrow(() -> new IllegalArgumentException("Device/Token not found"));
+
+        // 2. Ensure it belongs to the user
+        if (!token.getUser().getUsername().equals(username)) {
+            throw new IllegalArgumentException("Unauthorized action");
+        }
+
+        // 3. Revoke
+        token.setRevoked(true);
+        token.setExpired(true);
+        tokenRepository.save(token);
     }
 
     public Map<String, Object> validateToken(String tokenValue) {

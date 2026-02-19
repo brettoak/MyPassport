@@ -91,8 +91,8 @@ public class UserControllerTest {
     @Test
     @WithMockUser(username = "testuser")
     public void testGetActiveDevices() throws Exception {
-        DeviceResponse device1 = new DeviceResponse("127.0.0.1", "Chrome", LocalDateTime.now(), true);
-        DeviceResponse device2 = new DeviceResponse("192.168.1.5", "Firefox", LocalDateTime.now(), false);
+        DeviceResponse device1 = new DeviceResponse(1L, "127.0.0.1", "Chrome", LocalDateTime.now(), true);
+        DeviceResponse device2 = new DeviceResponse(2L, "192.168.1.5", "Firefox", LocalDateTime.now(), false);
         List<DeviceResponse> devices = Arrays.asList(device1, device2);
 
         when(userService.getActiveDevices(eq("testuser"), anyString())).thenReturn(devices);

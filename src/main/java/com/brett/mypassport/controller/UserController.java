@@ -14,6 +14,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -79,5 +81,22 @@ public class UserController {
         }
         String token = request.getHeader("Authorization");
         return userService.getActiveDevices(userDetails.getUsername(), token);
+    }
+
+    @Operation(summary = "Kick Device", description = "Revokes the session for a specific device/token.")
+    @SecurityRequirement(name = "bearerAuth")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Device kicked successfully"),
+            @ApiResponse(responseCode = "403", description = "Unauthorized access or token not found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    @Order(13)
+    @DeleteMapping("/devices/{tokenId}")
+    public String kickDevice(@AuthenticationPrincipal UserDetails userDetails, @PathVariable Long tokenId) {
+        if (userDetails == null) {
+            throw new org.springframework.security.access.AccessDeniedException("User not authenticated");
+        }
+        userService.revokeDevice(tokenId, userDetails.getUsername());
+        return "Device kicked successfully";
     }
 }

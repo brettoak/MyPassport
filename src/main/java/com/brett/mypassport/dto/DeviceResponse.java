@@ -6,6 +6,9 @@ import java.time.LocalDateTime;
 @Schema(description = "Response object for device information")
 public class DeviceResponse {
 
+    @Schema(description = "Token ID", example = "123")
+    private Long id;
+
     @Schema(description = "IP Address of the device", example = "192.168.1.1")
     private String ipAddress;
 
@@ -18,7 +21,8 @@ public class DeviceResponse {
     @Schema(description = "Whether this is the current session", example = "true")
     private boolean isCurrent;
 
-    public DeviceResponse(String ipAddress, String deviceInfo, LocalDateTime lastActive, boolean isCurrent) {
+    public DeviceResponse(Long id, String ipAddress, String deviceInfo, LocalDateTime lastActive, boolean isCurrent) {
+        this.id = id;
         this.ipAddress = ipAddress;
         this.deviceInfo = deviceInfo;
         this.lastActive = lastActive;
@@ -26,6 +30,14 @@ public class DeviceResponse {
     }
 
     // Getters and Setters
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public String getIpAddress() {
         return ipAddress;
     }
