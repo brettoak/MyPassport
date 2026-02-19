@@ -336,7 +336,12 @@ public class UserService implements UserDetailsService {
             throw new IllegalArgumentException("Unauthorized action");
         }
 
-        // 4. Revoke
+        // 4. Check if already revoked/expired
+        if (token.isRevoked() || token.isExpired()) {
+            throw new IllegalArgumentException("Device/Token is already invalid");
+        }
+
+        // 5. Revoke
         token.setRevoked(true);
         token.setExpired(true);
         tokenRepository.save(token);
