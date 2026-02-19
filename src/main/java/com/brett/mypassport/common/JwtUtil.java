@@ -52,6 +52,10 @@ public class JwtUtil {
         return (extractedUsername.equals(username) && !isTokenExpired(token));
     }
 
+    public Boolean validateToken(String token) {
+        return !isTokenExpired(token);
+    }
+
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }

@@ -7,6 +7,7 @@ import com.brett.mypassport.dto.RefreshTokenRequest;
 import com.brett.mypassport.dto.RegisterRequest;
 import com.brett.mypassport.dto.ResetPasswordRequest;
 import com.brett.mypassport.dto.VerificationRequest;
+import com.brett.mypassport.dto.TokenValidationRequest;
 import com.brett.mypassport.service.UserService;
 import com.brett.mypassport.service.VerificationService;
 import com.brett.mypassport.config.RsaKeyProperties;
@@ -53,6 +54,19 @@ public class AuthController {
                 Base64.getEncoder().encodeToString(publicKey.getEncoded()) +
                 "\n-----END PUBLIC KEY-----";
         return Map.of("algorithm", "RS256", "publicKey", publicKeyPEM);
+    }
+
+    @Operation(summary = "Check Token", description = "Validates the token signature and expiration, and checks if it has been revoked.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Token validation result returned"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    @PostMapping("/check-token")
+    public Map<String, Object> checkToken(@RequestBody TokenValidationRequest request) {
+        if (request.getToken() == null || request.getToken().isEmpty()) {
+             return Map.of("valid", false, "reason", "Token is empty");
+        }
+        return userService.validateToken(request.getToken());
     }
 
     @Operation(summary = "Send Verification Code", description = "Generates a verification code and sends it to the provided email address. The code expires in 60 seconds.")

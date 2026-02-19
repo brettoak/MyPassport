@@ -1,6 +1,7 @@
 package com.brett.mypassport.service;
 
 import java.util.List;
+import java.util.Map;
 import com.brett.mypassport.dto.LoginRequest;
 import com.brett.mypassport.dto.LoginResponse;
 import com.brett.mypassport.dto.LoginResponse;
@@ -68,7 +69,25 @@ public class UserService implements UserDetailsService {
     }
 
     private void saveUserToken(User user, String jwtToken, String refreshToken, String ipAddress, String deviceInfo) {
-        // Option: Revoke old tokens here if needed
+        // 1. Find existing valid tokens for this user
+        List<Token> validTokens = tokenRepository.findAllValidTokensByUser(user.getId());
+
+        // 2. Revoke any token that comes from the SAME device
+        if (deviceInfo != null && !validTokens.isEmpty()) {
+            List<Token> tokensToRevoke = validTokens.stream()
+                    .filter(t -> deviceInfo.equals(t.getDeviceInfo()))
+                    .peek(t -> {
+                        t.setRevoked(true);
+                        t.setExpired(true);
+                    })
+                    .toList();
+            
+            if (!tokensToRevoke.isEmpty()) {
+                tokenRepository.saveAll(tokensToRevoke);
+            }
+        }
+
+        // 3. Save new token
         Token token = new Token();
         token.setUser(user);
         token.setToken(jwtToken);
@@ -295,4 +314,35 @@ public class UserService implements UserDetailsService {
                 ))
                 .collect(java.util.stream.Collectors.toList());
     }
+
+    public Map<String, Object> validateToken(String tokenValue) {
+        try {
+            // Remove "Bearer " if present
+            String token = tokenValue.startsWith("Bearer ") ? tokenValue.substring(7) : tokenValue;
+
+            // 1. Check signature and expiry (JwtUtil throws exception if invalid)
+            if (!jwtUtil.validateToken(token)) {
+                return Map.of("valid", false, "reason", "Expired or invalid structure");
+            }
+
+            // 2. Check DB revocation
+            Token dbToken = tokenRepository.findByToken(token).orElse(null);
+            if (dbToken == null || dbToken.isRevoked() || dbToken.isExpired()) {
+                return Map.of("valid", false, "reason", "Revoked or not found in registry");
+            }
+
+            // 3. Return details
+            String username = jwtUtil.extractUsername(token);
+            return Map.of(
+                    "valid", true,
+                    "active", true,
+                    "username", username,
+                    "sub", username,
+                    "exp", jwtUtil.extractExpiration(token)
+            );
+        } catch (Exception e) {
+            return Map.of("valid", false, "reason", "Invalid token: " + e.getMessage());
+        }
+    }
 }
+
