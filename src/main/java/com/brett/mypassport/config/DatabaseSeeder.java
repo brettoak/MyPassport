@@ -105,30 +105,48 @@ public class DatabaseSeeder implements ApplicationRunner {
     }
 
     private void seedUsers() {
-        if (!userRepository.existsByUsername("admin@example.com")) {
-            System.out.println("Seeding database with admin and users...");
-            
-            Role adminRole = roleRepository.findByName("ADMIN").orElse(null);
-            Role userRole = roleRepository.findByName("USER").orElse(null);
+        System.out.println("Checking database users...");
+        
+        Role adminRole = roleRepository.findByName("ADMIN").orElse(null);
+        Role userRole = roleRepository.findByName("USER").orElse(null);
 
-            User admin = new User();
-            admin.setUsername("admin@example.com");
-            admin.setPassword(passwordEncoder.encode("admin123"));
-            admin.setEmail("admin@example.com");
-            if (adminRole != null) {
-                admin.setRoles(new HashSet<>(Arrays.asList(adminRole)));
-            }
-            userRepository.save(admin);
+        // Seed Admin User
+        userRepository.findByUsername("admin@example.com").ifPresent(user -> {
+            System.out.println("Deleting existing admin@example.com to re-seed...");
+            userRepository.delete(user);
+        });
 
-            User user = new User();
-            user.setUsername("user@example.com");
-            user.setPassword(passwordEncoder.encode("password"));
-            user.setEmail("user@example.com");
-            if (userRole != null) {
-                user.setRoles(new HashSet<>(Arrays.asList(userRole)));
-            }
-            userRepository.save(user);
+        User admin = new User();
+        admin.setUsername("admin@example.com");
+        admin.setPassword(passwordEncoder.encode("admin123"));
+        admin.setEmail("admin@example.com");
+        if (adminRole != null) {
+            admin.setRoles(new HashSet<>(Arrays.asList(adminRole)));
+        }
+        userRepository.save(admin);
+        System.out.println("Seeded admin@example.com");
 
+        // Seed Standard User
+        boolean isFirstTimeUserSeeding = false;
+        if (userRepository.existsByUsername("user@example.com")) {
+            System.out.println("Deleting existing user@example.com to re-seed...");
+            userRepository.findByUsername("user@example.com").ifPresent(userRepository::delete);
+        } else {
+            isFirstTimeUserSeeding = true; // only seed random users if the main user didn't exist at all
+        }
+
+        User user = new User();
+        user.setUsername("user@example.com");
+        user.setPassword(passwordEncoder.encode("123"));
+        user.setEmail("user@example.com");
+        if (userRole != null) {
+            user.setRoles(new HashSet<>(Arrays.asList(userRole)));
+        }
+        userRepository.save(user);
+        System.out.println("Seeded user@example.com");
+        
+        // Only seed random users if we are seeding the main test user for the first time
+        if (isFirstTimeUserSeeding) {
             for (int i = 0; i < 2; i++) {
                 User randomUser = new User();
                 randomUser.setUsername(faker.name().username());
@@ -139,9 +157,7 @@ public class DatabaseSeeder implements ApplicationRunner {
                 }
                 userRepository.save(randomUser);
             }
-            System.out.println("Database seeded successfully.");
-        } else {
-            System.out.println("Database users already seeded. Skipping...");
+            System.out.println("Seeded random users.");
         }
     }
 }
