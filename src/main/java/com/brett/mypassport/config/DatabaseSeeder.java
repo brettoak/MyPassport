@@ -111,12 +111,7 @@ public class DatabaseSeeder implements ApplicationRunner {
         Role userRole = roleRepository.findByName("USER").orElse(null);
 
         // Seed Admin User
-        userRepository.findByUsername("admin@example.com").ifPresent(user -> {
-            System.out.println("Deleting existing admin@example.com to re-seed...");
-            userRepository.delete(user);
-        });
-
-        User admin = new User();
+        User admin = userRepository.findByUsername("admin@example.com").orElseGet(User::new);
         admin.setUsername("admin@example.com");
         admin.setPassword(passwordEncoder.encode("admin123"));
         admin.setEmail("admin@example.com");
@@ -124,18 +119,12 @@ public class DatabaseSeeder implements ApplicationRunner {
             admin.setRoles(new HashSet<>(Arrays.asList(adminRole)));
         }
         userRepository.save(admin);
-        System.out.println("Seeded admin@example.com");
+        System.out.println("Seeded/Updated admin@example.com");
 
         // Seed Standard User
-        boolean isFirstTimeUserSeeding = false;
-        if (userRepository.existsByUsername("user@example.com")) {
-            System.out.println("Deleting existing user@example.com to re-seed...");
-            userRepository.findByUsername("user@example.com").ifPresent(userRepository::delete);
-        } else {
-            isFirstTimeUserSeeding = true; // only seed random users if the main user didn't exist at all
-        }
-
-        User user = new User();
+        boolean isFirstTimeUserSeeding = !userRepository.existsByUsername("user@example.com");
+        
+        User user = userRepository.findByUsername("user@example.com").orElseGet(User::new);
         user.setUsername("user@example.com");
         user.setPassword(passwordEncoder.encode("123"));
         user.setEmail("user@example.com");
@@ -143,7 +132,7 @@ public class DatabaseSeeder implements ApplicationRunner {
             user.setRoles(new HashSet<>(Arrays.asList(userRole)));
         }
         userRepository.save(user);
-        System.out.println("Seeded user@example.com");
+        System.out.println("Seeded/Updated user@example.com");
         
         // Only seed random users if we are seeding the main test user for the first time
         if (isFirstTimeUserSeeding) {
