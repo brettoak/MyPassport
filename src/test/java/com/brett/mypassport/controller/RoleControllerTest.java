@@ -14,6 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import com.brett.mypassport.config.SecurityConfig;
+import com.brett.mypassport.config.RsaKeyProperties;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -41,11 +42,14 @@ public class RoleControllerTest {
     @MockBean
     private JwtUtil jwtUtil;
 
+    @MockBean
+    private RsaKeyProperties rsaKeyProperties;
+
     @Autowired
     private ObjectMapper objectMapper;
 
     @Test
-    @WithMockUser(username = "admin")
+    @WithMockUser(username = "admin", authorities = {"ROLE_MANAGE"})
     public void testCreateRole() throws Exception {
         RoleRequest request = new RoleRequest();
         request.setName("ADMIN");
@@ -70,7 +74,7 @@ public class RoleControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "admin")
+    @WithMockUser(username = "admin", authorities = {"ROLE_MANAGE"})
     public void testGetAllRoles() throws Exception {
         RoleResponse role1 = new RoleResponse();
         role1.setId(1L);
@@ -93,7 +97,7 @@ public class RoleControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "admin")
+    @WithMockUser(username = "admin", authorities = {"ROLE_MANAGE"})
     public void testGetRoleById() throws Exception {
         RoleResponse role = new RoleResponse();
         role.setId(1L);
@@ -109,7 +113,7 @@ public class RoleControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "admin")
+    @WithMockUser(username = "admin", authorities = {"ROLE_MANAGE"})
     public void testUpdateRole() throws Exception {
         RoleRequest request = new RoleRequest();
         request.setName("SUPER_ADMIN");
@@ -133,7 +137,7 @@ public class RoleControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "admin")
+    @WithMockUser(username = "admin", authorities = {"ROLE_MANAGE"})
     public void testDeleteRole() throws Exception {
         doNothing().when(roleService).deleteRole(1L);
 

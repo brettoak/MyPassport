@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import com.brett.mypassport.config.SecurityConfig;
+import com.brett.mypassport.config.RsaKeyProperties;
 
 import java.util.Arrays;
 import java.util.List;
@@ -34,8 +35,11 @@ public class PermissionControllerTest {
     @MockBean
     private JwtUtil jwtUtil;
 
+    @MockBean
+    private RsaKeyProperties rsaKeyProperties;
+
     @Test
-    @WithMockUser(username = "admin")
+    @WithMockUser(username = "admin", authorities = {"ROLE_MANAGE"})
     public void testGetAllPermissions() throws Exception {
         PermissionResponse perm1 = new PermissionResponse();
         perm1.setId(1L);

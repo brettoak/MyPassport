@@ -27,6 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.springframework.context.annotation.Import;
 import com.brett.mypassport.config.SecurityConfig;
+import com.brett.mypassport.config.RsaKeyProperties;
 
 @WebMvcTest(AuthController.class)
 @Import(SecurityConfig.class)
@@ -43,6 +44,9 @@ public class AuthControllerTest {
 
         @MockBean
         private JwtUtil jwtUtil;
+
+        @MockBean
+        private RsaKeyProperties rsaKeyProperties;
 
         @Autowired
         private ObjectMapper objectMapper;

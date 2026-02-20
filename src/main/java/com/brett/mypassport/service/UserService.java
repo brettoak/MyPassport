@@ -2,6 +2,8 @@ package com.brett.mypassport.service;
 
 import java.util.List;
 import java.util.Map;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import com.brett.mypassport.dto.LoginRequest;
 import com.brett.mypassport.dto.LoginResponse;
 import com.brett.mypassport.dto.LoginResponse;
@@ -23,6 +25,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -219,14 +224,26 @@ public class UserService implements UserDetailsService {
 
 
     @Override
+    @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
 
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        
+        // Add roles (Spring Security convention usually prefixes roles with "ROLE_")
+        for (Role role : user.getRoles()) {
+            authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getName()));
+            // Add raw permissions
+            for (com.brett.mypassport.entity.Permission permission : role.getPermissions()) {
+                authorities.add(new SimpleGrantedAuthority(permission.getName()));
+            }
+        }
+
         return new org.springframework.security.core.userdetails.User(
                 user.getUsername(),
                 user.getPassword(),
-                Collections.emptyList() // No roles for now
+                authorities
         );
     }
 
@@ -234,6 +251,10 @@ public class UserService implements UserDetailsService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
                 
+        return mapUserToUserResponse(user);
+    }
+    
+    private UserResponse mapUserToUserResponse(User user) {
         Set<String> roles = user.getRoles().stream()
                 .map(Role::getName)
                 .collect(java.util.stream.Collectors.toSet());
@@ -252,6 +273,17 @@ public class UserService implements UserDetailsService {
                 roles,
                 permissions
         );
+    }
+
+    public Page<UserResponse> getAllUsers(Pageable pageable) {
+        return userRepository.findAll(pageable)
+                .map(this::mapUserToUserResponse);
+    }
+
+    public UserResponse getUserById(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + id));
+        return mapUserToUserResponse(user);
     }
 
 

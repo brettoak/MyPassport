@@ -8,6 +8,8 @@ import com.brett.mypassport.service.UserService;
 import com.brett.mypassport.common.JwtUtil;
 import java.util.Arrays;
 import java.util.List;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.springframework.context.annotation.Import;
 import com.brett.mypassport.config.SecurityConfig;
+import com.brett.mypassport.config.RsaKeyProperties;
 
 import java.time.LocalDateTime;
 
@@ -49,6 +52,9 @@ public class UserControllerTest {
 
     @MockBean
     private JwtUtil jwtUtil;
+
+    @MockBean
+    private RsaKeyProperties rsaKeyProperties;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -149,7 +155,7 @@ public class UserControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "admin")
+    @WithMockUser(username = "admin", authorities = {"ROLE_MANAGE"})
     public void testAssignRolesSuccess() throws Exception {
         UserRoleRequest request = new UserRoleRequest();
         request.setRoleIds(Arrays.asList(1L, 2L));
@@ -163,5 +169,40 @@ public class UserControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data").value("Roles assigned successfully"));
+    }
+
+    @Test
+    @WithMockUser(username = "admin", authorities = {"USER_VIEW"})
+    public void testGetAllUsersSuccess() throws Exception {
+        UserResponse mockResponse = new UserResponse(
+                1L, "testuser", "test@example.com", LocalDateTime.now(), LocalDateTime.now(),
+                java.util.Collections.emptySet(), java.util.Collections.emptySet()
+        );
+        PageImpl<UserResponse> page = new PageImpl<>(Arrays.asList(mockResponse), PageRequest.of(0, 10), 1);
+
+        when(userService.getAllUsers(any())).thenReturn(page);
+
+        mockMvc.perform(get("/api/v1/users")
+                .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200))
+                .andExpect(jsonPath("$.data.content[0].username").value("testuser"));
+    }
+
+    @Test
+    @WithMockUser(username = "admin", authorities = {"USER_VIEW"})
+    public void testGetUserByIdSuccess() throws Exception {
+        UserResponse mockResponse = new UserResponse(
+                1L, "testuser", "test@example.com", LocalDateTime.now(), LocalDateTime.now(),
+                java.util.Collections.emptySet(), java.util.Collections.emptySet()
+        );
+
+        when(userService.getUserById(1L)).thenReturn(mockResponse);
+
+        mockMvc.perform(get("/api/v1/users/1")
+                .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200))
+                .andExpect(jsonPath("$.data.username").value("testuser"));
     }
 }

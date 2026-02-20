@@ -25,6 +25,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import com.brett.mypassport.dto.DeviceResponse;
 import org.springframework.core.annotation.Order;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping(ApiConstants.API_V1 + "/users")
@@ -103,14 +108,46 @@ public class UserController {
     }
 
     @Operation(summary = "Assign Roles to User", description = "Replaces the current roles of a user with a new set of roles.")
+    @SecurityRequirement(name = "bearerAuth")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Roles assigned successfully"),
             @ApiResponse(responseCode = "400", description = "User not found or invalid roles")
     })
     @Order(14)
+    @PreAuthorize("hasAuthority('ROLE_MANAGE')")
     @PostMapping("/{id}/roles")
     public String assignRoles(@PathVariable Long id, @RequestBody UserRoleRequest request) {
         userService.assignRolesToUser(id, request.getRoleIds());
         return "Roles assigned successfully";
+    }
+
+    @Operation(summary = "Get All Users", description = "Retrieves a paginated list of all users. Requires USER_VIEW permission.")
+    @SecurityRequirement(name = "bearerAuth")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User list retrieved successfully"),
+            @ApiResponse(responseCode = "403", description = "Unauthorized access")
+    })
+    @Order(15)
+    @PreAuthorize("hasAuthority('USER_VIEW')")
+    @GetMapping
+    public Page<UserResponse> getAllUsers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return userService.getAllUsers(pageable);
+    }
+
+    @Operation(summary = "Get User by ID", description = "Retrieves a specific user's details. Requires USER_VIEW permission.")
+    @SecurityRequirement(name = "bearerAuth")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User retrieved successfully"),
+            @ApiResponse(responseCode = "404", description = "User not found"),
+            @ApiResponse(responseCode = "403", description = "Unauthorized access")
+    })
+    @Order(16)
+    @PreAuthorize("hasAuthority('USER_VIEW')")
+    @GetMapping("/{id}")
+    public UserResponse getUserById(@PathVariable Long id) {
+        return userService.getUserById(id);
     }
 }
