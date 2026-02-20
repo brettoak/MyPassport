@@ -3,6 +3,7 @@ package com.brett.mypassport.controller;
 import com.brett.mypassport.dto.ChangePasswordRequest;
 import com.brett.mypassport.dto.DeviceResponse;
 import com.brett.mypassport.dto.UserResponse;
+import com.brett.mypassport.dto.UserRoleRequest;
 import com.brett.mypassport.service.UserService;
 import com.brett.mypassport.common.JwtUtil;
 import java.util.Arrays;
@@ -143,5 +144,22 @@ public class UserControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data").value("Device kicked successfully"));
+    }
+
+    @Test
+    @WithMockUser(username = "admin")
+    public void testAssignRolesSuccess() throws Exception {
+        UserRoleRequest request = new UserRoleRequest();
+        request.setRoleIds(Arrays.asList(1L, 2L));
+
+        doNothing().when(userService).assignRolesToUser(eq(1L), eq(request.getRoleIds()));
+
+        mockMvc.perform(post("/api/v1/users/1/roles")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request))
+                .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200))
+                .andExpect(jsonPath("$.data").value("Roles assigned successfully"));
     }
 }
