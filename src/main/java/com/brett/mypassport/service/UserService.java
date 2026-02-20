@@ -396,7 +396,11 @@ public class UserService implements UserDetailsService {
 
         Set<Role> roles = new HashSet<>();
         if (roleIds != null && !roleIds.isEmpty()) {
-            roles.addAll(roleRepository.findAllById(roleIds));
+            List<Role> foundRoles = roleRepository.findAllById(roleIds);
+            if (foundRoles.size() != roleIds.size()) {
+                throw new IllegalArgumentException("One or more role IDs are invalid.");
+            }
+            roles.addAll(foundRoles);
         }
 
         user.setRoles(roles);

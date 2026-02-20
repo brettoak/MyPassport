@@ -114,7 +114,11 @@ public class RoleService {
 
         Set<Permission> permissions = new HashSet<>();
         if (permissionIds != null && !permissionIds.isEmpty()) {
-            permissions.addAll(permissionRepository.findAllById(permissionIds));
+            List<Permission> foundPermissions = permissionRepository.findAllById(permissionIds);
+            if (foundPermissions.size() != permissionIds.size()) {
+                throw new IllegalArgumentException("One or more permission IDs are invalid.");
+            }
+            permissions.addAll(foundPermissions);
         }
         
         // This completely replaces any existing permissions with the new set
