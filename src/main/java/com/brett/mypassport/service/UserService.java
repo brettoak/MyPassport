@@ -233,12 +233,24 @@ public class UserService implements UserDetailsService {
     public UserResponse getUserProfile(String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                
+        Set<String> roles = user.getRoles().stream()
+                .map(Role::getName)
+                .collect(java.util.stream.Collectors.toSet());
+
+        Set<String> permissions = user.getRoles().stream()
+                .flatMap(role -> role.getPermissions().stream())
+                .map(com.brett.mypassport.entity.Permission::getName)
+                .collect(java.util.stream.Collectors.toSet());
+
         return new UserResponse(
                 user.getId(),
                 user.getUsername(),
                 user.getEmail(),
                 user.getCreatedAt(),
-                user.getUpdatedAt()
+                user.getUpdatedAt(),
+                roles,
+                permissions
         );
     }
 

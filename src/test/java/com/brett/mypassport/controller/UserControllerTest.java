@@ -57,7 +57,9 @@ public class UserControllerTest {
     @WithMockUser(username = "testuser")
     public void testGetUserProfileSuccess() throws Exception {
         UserResponse mockResponse = new UserResponse(
-                1L, "testuser", "test@example.com", LocalDateTime.now(), LocalDateTime.now());
+                1L, "testuser", "test@example.com", LocalDateTime.now(), LocalDateTime.now(),
+                java.util.Collections.emptySet(), java.util.Collections.emptySet()
+        );
 
         when(userService.getUserProfile("testuser")).thenReturn(mockResponse);
 
