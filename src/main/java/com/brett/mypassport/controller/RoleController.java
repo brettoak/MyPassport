@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.core.annotation.Order;
 
 import java.util.List;
 
@@ -29,6 +30,7 @@ public class RoleController {
             @ApiResponse(responseCode = "200", description = "Role created successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid request or role already exists")
     })
+    @Order(20)
     @PostMapping
     public RoleResponse createRole(@RequestBody RoleRequest request) {
         if (request.getName() == null || request.getName().trim().isEmpty()) {
@@ -42,6 +44,7 @@ public class RoleController {
             @ApiResponse(responseCode = "200", description = "Role updated successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid request or role not found")
     })
+    @Order(21)
     @PutMapping("/{id}")
     public RoleResponse updateRole(@PathVariable Long id, @RequestBody RoleRequest request) {
         if (request.getName() == null || request.getName().trim().isEmpty()) {
@@ -55,6 +58,7 @@ public class RoleController {
             @ApiResponse(responseCode = "200", description = "Role deleted successfully"),
             @ApiResponse(responseCode = "400", description = "Role not found")
     })
+    @Order(22)
     @DeleteMapping("/{id}")
     public String deleteRole(@PathVariable Long id) {
         roleService.deleteRole(id);
@@ -63,6 +67,7 @@ public class RoleController {
 
     @Operation(summary = "Get All Roles", description = "Retrieves a list of all roles in the system.")
     @ApiResponse(responseCode = "200", description = "Roles retrieved successfully")
+    @Order(23)
     @GetMapping
     public List<RoleResponse> getAllRoles() {
         return roleService.getAllRoles();
@@ -73,6 +78,7 @@ public class RoleController {
             @ApiResponse(responseCode = "200", description = "Role retrieved successfully"),
             @ApiResponse(responseCode = "400", description = "Role not found")
     })
+    @Order(24)
     @GetMapping("/{id}")
     public RoleResponse getRoleById(@PathVariable Long id) {
         return roleService.getRoleById(id);
