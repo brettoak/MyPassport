@@ -2,6 +2,7 @@ package com.brett.mypassport.controller;
 
 import com.brett.mypassport.common.ApiConstants;
 import com.brett.mypassport.dto.UserResponse;
+import com.brett.mypassport.dto.UserRoleRequest;
 import com.brett.mypassport.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -99,5 +100,17 @@ public class UserController {
         String token = request.getHeader("Authorization");
         userService.revokeDevice(tokenId, userDetails.getUsername(), token);
         return "Device kicked successfully";
+    }
+
+    @Operation(summary = "Assign Roles to User", description = "Replaces the current roles of a user with a new set of roles.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Roles assigned successfully"),
+            @ApiResponse(responseCode = "400", description = "User not found or invalid roles")
+    })
+    @Order(14)
+    @PostMapping("/{id}/roles")
+    public String assignRoles(@PathVariable Long id, @RequestBody UserRoleRequest request) {
+        userService.assignRolesToUser(id, request.getRoleIds());
+        return "Roles assigned successfully";
     }
 }

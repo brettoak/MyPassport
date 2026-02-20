@@ -11,9 +11,11 @@ import com.brett.mypassport.dto.ResetPasswordRequest;
 import com.brett.mypassport.dto.UserResponse;
 import com.brett.mypassport.entity.Token;
 import com.brett.mypassport.entity.User;
+import com.brett.mypassport.entity.Role;
 import com.brett.mypassport.common.JwtUtil;
 import com.brett.mypassport.repository.TokenRepository;
 import com.brett.mypassport.repository.UserRepository;
+import com.brett.mypassport.repository.RoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +24,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -40,6 +44,9 @@ public class UserService implements UserDetailsService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private RoleRepository roleRepository;
 
     public LoginResponse login(LoginRequest request, String ipAddress, String deviceInfo) {
         // 1. Find user by email (or username, logic can be added)
@@ -375,6 +382,25 @@ public class UserService implements UserDetailsService {
         } catch (Exception e) {
             return Map.of("valid", false, "reason", "Invalid token: " + e.getMessage());
         }
+    }
+
+    /**
+     * Assign roles to a user.
+     * @param userId The user ID
+     * @param roleIds List of role IDs to assign
+     */
+    @Transactional
+    public void assignRolesToUser(Long userId, List<Long> roleIds) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User with ID " + userId + " not found"));
+
+        Set<Role> roles = new HashSet<>();
+        if (roleIds != null && !roleIds.isEmpty()) {
+            roles.addAll(roleRepository.findAllById(roleIds));
+        }
+
+        user.setRoles(roles);
+        userRepository.save(user);
     }
 }
 

@@ -3,6 +3,7 @@ package com.brett.mypassport.controller;
 import com.brett.mypassport.common.ApiConstants;
 import com.brett.mypassport.dto.RoleRequest;
 import com.brett.mypassport.dto.RoleResponse;
+import com.brett.mypassport.dto.RolePermissionRequest;
 import com.brett.mypassport.service.RoleService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -82,5 +83,17 @@ public class RoleController {
     @GetMapping("/{id}")
     public RoleResponse getRoleById(@PathVariable Long id) {
         return roleService.getRoleById(id);
+    }
+
+    @Operation(summary = "Assign Permissions to Role", description = "Replaces the current permissions of a role with a new set of permissions.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Permissions assigned successfully"),
+            @ApiResponse(responseCode = "400", description = "Role not found or invalid permissions")
+    })
+    @Order(25)
+    @PostMapping("/{id}/permissions")
+    public String assignPermissions(@PathVariable Long id, @RequestBody RolePermissionRequest request) {
+        roleService.assignPermissionsToRole(id, request.getPermissionIds());
+        return "Permissions assigned successfully";
     }
 }

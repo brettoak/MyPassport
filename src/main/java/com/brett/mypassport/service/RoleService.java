@@ -4,18 +4,25 @@ import com.brett.mypassport.dto.RoleRequest;
 import com.brett.mypassport.dto.RoleResponse;
 import com.brett.mypassport.entity.Role;
 import com.brett.mypassport.repository.RoleRepository;
+import com.brett.mypassport.entity.Permission;
+import com.brett.mypassport.repository.PermissionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.HashSet;
+import java.util.Set;
 
 @Service
 public class RoleService {
 
     @Autowired
     private RoleRepository roleRepository;
+
+    @Autowired
+    private PermissionRepository permissionRepository;
 
     /**
      * Create a new role.
@@ -93,6 +100,26 @@ public class RoleService {
         Role role = roleRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Role with ID " + id + " not found"));
         return mapToResponse(role);
+    }
+
+    /**
+     * Assign permissions to a role.
+     * @param roleId The role ID
+     * @param permissionIds List of permission IDs to assign
+     */
+    @Transactional
+    public void assignPermissionsToRole(Long roleId, List<Long> permissionIds) {
+        Role role = roleRepository.findById(roleId)
+                .orElseThrow(() -> new IllegalArgumentException("Role with ID " + roleId + " not found"));
+
+        Set<Permission> permissions = new HashSet<>();
+        if (permissionIds != null && !permissionIds.isEmpty()) {
+            permissions.addAll(permissionRepository.findAllById(permissionIds));
+        }
+        
+        // This completely replaces any existing permissions with the new set
+        role.setPermissions(permissions);
+        roleRepository.save(role);
     }
 
     /**
