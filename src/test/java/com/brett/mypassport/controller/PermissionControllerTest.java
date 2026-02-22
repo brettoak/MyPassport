@@ -40,7 +40,7 @@ public class PermissionControllerTest {
     private RsaKeyProperties rsaKeyProperties;
 
     @Test
-    @WithMockUser(username = "admin", authorities = {PermissionConstants.ROLE_VIEW})
+    @WithMockUser(username = "admin", authorities = {PermissionConstants.PERMISSION_VIEW})
     public void testGetAllPermissions() throws Exception {
         PermissionResponse perm1 = new PermissionResponse();
         perm1.setId(1L);
@@ -49,7 +49,7 @@ public class PermissionControllerTest {
 
         PermissionResponse perm2 = new PermissionResponse();
         perm2.setId(2L);
-        perm2.setName("ROLE_VIEW");
+        perm2.setName("PERMISSION_VIEW");
         perm2.setModule("ROLE_MANAGEMENT");
 
         List<PermissionResponse> permissions = Arrays.asList(perm1, perm2);
@@ -61,6 +61,6 @@ public class PermissionControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data[0].name").value("USER_CREATE"))
-                .andExpect(jsonPath("$.data[1].name").value("ROLE_VIEW"));
+                .andExpect(jsonPath("$.data[1].name").value("PERMISSION_VIEW"));
     }
 }

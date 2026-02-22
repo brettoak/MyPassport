@@ -22,6 +22,7 @@ public final class PermissionConstants {
     public static final String ROLE_UPDATE = "ROLE_UPDATE";
     public static final String ROLE_DELETE = "ROLE_DELETE";
     public static final String ROLE_ASSIGN = "ROLE_ASSIGN";
+    public static final String PERMISSION_VIEW = "PERMISSION_VIEW";
 
     // Device/Session Management
     public static final String DEVICE_VIEW = "DEVICE_VIEW";

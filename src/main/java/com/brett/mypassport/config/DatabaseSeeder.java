@@ -56,6 +56,7 @@ public class DatabaseSeeder implements ApplicationRunner {
         Permission roleUpdate = createOrUpdatePermission(PermissionConstants.ROLE_UPDATE, "Edit roles", "ROLE_MANAGEMENT");
         Permission roleDelete = createOrUpdatePermission(PermissionConstants.ROLE_DELETE, "Delete roles", "ROLE_MANAGEMENT");
         Permission roleAssign = createOrUpdatePermission(PermissionConstants.ROLE_ASSIGN, "Assign roles to users", "ROLE_MANAGEMENT");
+        Permission permissionView = createOrUpdatePermission(PermissionConstants.PERMISSION_VIEW, "View system permissions", "ROLE_MANAGEMENT");
 
         // Device/Session Management Permissions
         Permission deviceView = createOrUpdatePermission(PermissionConstants.DEVICE_VIEW, "View active sessions and devices", "DEVICE_MANAGEMENT");
@@ -67,7 +68,7 @@ public class DatabaseSeeder implements ApplicationRunner {
         
         List<Permission> allPermissions = Arrays.asList(
                 userView, userCreate, userUpdate, userDelete,
-                roleView, roleCreate, roleUpdate, roleDelete, roleAssign,
+                roleView, roleCreate, roleUpdate, roleDelete, roleAssign, permissionView,
                 deviceView, deviceKick,
                 sysConfigView, sysConfigEdit
         );

@@ -28,7 +28,7 @@ public class PermissionController {
     @Operation(summary = "Get All Permissions", description = "Retrieves a list of all predefined system permissions.")
     @ApiResponse(responseCode = "200", description = "Permissions retrieved successfully")
     @Order(30)
-    @PreAuthorize("hasAuthority(T(com.brett.mypassport.common.PermissionConstants).ROLE_VIEW)")
+    @PreAuthorize("hasAuthority(T(com.brett.mypassport.common.PermissionConstants).PERMISSION_VIEW)")
     @GetMapping
     public List<PermissionResponse> getAllPermissions() {
         return permissionService.getAllPermissions();
