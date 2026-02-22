@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.HashSet;
 import java.util.Set;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Service
 public class RoleService {
@@ -81,13 +83,12 @@ public class RoleService {
 
     /**
      * Retrieve all roles.
-     * @return List of role responses
+     * @return Page of role responses
      */
     @Transactional(readOnly = true)
-    public List<RoleResponse> getAllRoles() {
-        return roleRepository.findAll().stream()
-                .map(this::mapToResponse)
-                .collect(Collectors.toList());
+    public Page<RoleResponse> getAllRoles(Pageable pageable) {
+        return roleRepository.findAll(pageable)
+                .map(this::mapToResponse);
     }
 
     /**

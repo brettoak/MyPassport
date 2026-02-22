@@ -16,12 +16,19 @@ import org.springframework.core.annotation.Order;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import java.util.List;
+import org.springframework.validation.annotation.Validated;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Max;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 @RestController
 @RequestMapping(ApiConstants.API_V1 + "/roles")
 @Tag(name = "Role", description = "APIs for Role management (RBAC)")
 // For now, requiring bearerAuth for all Role APIs. Later, you can restrict this to admins only.
 @SecurityRequirement(name = "bearerAuth") 
+@Validated
 public class RoleController {
 
     @Autowired
@@ -70,13 +77,16 @@ public class RoleController {
         return "Role deleted successfully";
     }
 
-    @Operation(summary = "Get All Roles", description = "Retrieves a list of all roles in the system.")
+    @Operation(summary = "Get All Roles", description = "Retrieves a paginated list of all roles in the system.")
     @ApiResponse(responseCode = "200", description = "Roles retrieved successfully")
     @Order(23)
     @PreAuthorize("hasAuthority(T(com.brett.mypassport.common.PermissionConstants).ROLE_VIEW)")
     @GetMapping
-    public List<RoleResponse> getAllRoles() {
-        return roleService.getAllRoles();
+    public Page<RoleResponse> getAllRoles(
+            @RequestParam(defaultValue = "0") @Min(value = 0, message = "Page index must not be less than zero") int page,
+            @RequestParam(defaultValue = "10") @Min(value = 0, message = "Page size must not be less than zero") @Max(value = 30, message = "Page size must not be greater than 30") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return roleService.getAllRoles(pageable);
     }
 
     @Operation(summary = "Get Role by ID", description = "Retrieves details of a specific role.")
