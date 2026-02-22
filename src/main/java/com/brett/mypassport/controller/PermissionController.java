@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import java.util.List;
 
 @RestController
@@ -27,6 +28,7 @@ public class PermissionController {
     @Operation(summary = "Get All Permissions", description = "Retrieves a list of all predefined system permissions.")
     @ApiResponse(responseCode = "200", description = "Permissions retrieved successfully")
     @Order(30)
+    @PreAuthorize("hasAuthority('ROLE_VIEW')")
     @GetMapping
     public List<PermissionResponse> getAllPermissions() {
         return permissionService.getAllPermissions();
