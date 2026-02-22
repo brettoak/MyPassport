@@ -155,7 +155,7 @@ public class UserControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "admin", authorities = {"ROLE_MANAGE"})
+    @WithMockUser(username = "admin", authorities = {"ROLE_ASSIGN"})
     public void testAssignRolesSuccess() throws Exception {
         UserRoleRequest request = new UserRoleRequest();
         request.setRoleIds(Arrays.asList(1L, 2L));

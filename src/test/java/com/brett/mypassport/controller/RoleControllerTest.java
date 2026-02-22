@@ -49,7 +49,7 @@ public class RoleControllerTest {
     private ObjectMapper objectMapper;
 
     @Test
-    @WithMockUser(username = "admin", authorities = {"ROLE_MANAGE"})
+    @WithMockUser(username = "admin", authorities = {"ROLE_CREATE"})
     public void testCreateRole() throws Exception {
         RoleRequest request = new RoleRequest();
         request.setName("ADMIN");
@@ -74,7 +74,7 @@ public class RoleControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "admin", authorities = {"ROLE_MANAGE"})
+    @WithMockUser(username = "admin", authorities = {"ROLE_VIEW"})
     public void testGetAllRoles() throws Exception {
         RoleResponse role1 = new RoleResponse();
         role1.setId(1L);
@@ -97,7 +97,7 @@ public class RoleControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "admin", authorities = {"ROLE_MANAGE"})
+    @WithMockUser(username = "admin", authorities = {"ROLE_VIEW"})
     public void testGetRoleById() throws Exception {
         RoleResponse role = new RoleResponse();
         role.setId(1L);
@@ -113,7 +113,7 @@ public class RoleControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "admin", authorities = {"ROLE_MANAGE"})
+    @WithMockUser(username = "admin", authorities = {"ROLE_UPDATE"})
     public void testUpdateRole() throws Exception {
         RoleRequest request = new RoleRequest();
         request.setName("SUPER_ADMIN");
@@ -137,7 +137,7 @@ public class RoleControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "admin", authorities = {"ROLE_MANAGE"})
+    @WithMockUser(username = "admin", authorities = {"ROLE_DELETE"})
     public void testDeleteRole() throws Exception {
         doNothing().when(roleService).deleteRole(1L);
 

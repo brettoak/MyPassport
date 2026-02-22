@@ -39,7 +39,7 @@ public class PermissionControllerTest {
     private RsaKeyProperties rsaKeyProperties;
 
     @Test
-    @WithMockUser(username = "admin", authorities = {"ROLE_MANAGE"})
+    @WithMockUser(username = "admin", authorities = {"ROLE_VIEW"})
     public void testGetAllPermissions() throws Exception {
         PermissionResponse perm1 = new PermissionResponse();
         perm1.setId(1L);
