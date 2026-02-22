@@ -42,63 +42,59 @@ public class DatabaseSeeder implements ApplicationRunner {
     }
 
     private void seedPermissionsAndRoles() {
-        if (permissionRepository.count() == 0) {
-            System.out.println("Seeding permissions...");
-            // User Management Permissions
-            Permission userView = createPermission("USER_VIEW", "View user details and lists", "USER_MANAGEMENT");
-            Permission userCreate = createPermission("USER_CREATE", "Create new users", "USER_MANAGEMENT");
-            Permission userUpdate = createPermission("USER_UPDATE", "Edit user details", "USER_MANAGEMENT");
-            Permission userDelete = createPermission("USER_DELETE", "Delete users", "USER_MANAGEMENT");
+        System.out.println("Seeding/Updating permissions...");
+        // User Management Permissions
+        Permission userView = createOrUpdatePermission("USER_VIEW", "View user details and lists", "USER_MANAGEMENT");
+        Permission userCreate = createOrUpdatePermission("USER_CREATE", "Create new users", "USER_MANAGEMENT");
+        Permission userUpdate = createOrUpdatePermission("USER_UPDATE", "Edit user details", "USER_MANAGEMENT");
+        Permission userDelete = createOrUpdatePermission("USER_DELETE", "Delete users", "USER_MANAGEMENT");
 
-            // Role Management Permissions
-            Permission roleView = createPermission("ROLE_VIEW", "View roles and permissions", "ROLE_MANAGEMENT");
-            Permission roleCreate = createPermission("ROLE_CREATE", "Create new roles", "ROLE_MANAGEMENT");
-            Permission roleUpdate = createPermission("ROLE_UPDATE", "Edit roles", "ROLE_MANAGEMENT");
-            Permission roleDelete = createPermission("ROLE_DELETE", "Delete roles", "ROLE_MANAGEMENT");
-            Permission roleAssign = createPermission("ROLE_ASSIGN", "Assign roles to users", "ROLE_MANAGEMENT");
+        // Role Management Permissions
+        Permission roleView = createOrUpdatePermission("ROLE_VIEW", "View roles and permissions", "ROLE_MANAGEMENT");
+        Permission roleCreate = createOrUpdatePermission("ROLE_CREATE", "Create new roles", "ROLE_MANAGEMENT");
+        Permission roleUpdate = createOrUpdatePermission("ROLE_UPDATE", "Edit roles", "ROLE_MANAGEMENT");
+        Permission roleDelete = createOrUpdatePermission("ROLE_DELETE", "Delete roles", "ROLE_MANAGEMENT");
+        Permission roleAssign = createOrUpdatePermission("ROLE_ASSIGN", "Assign roles to users", "ROLE_MANAGEMENT");
 
-            // Device/Session Management Permissions
-            Permission deviceView = createPermission("DEVICE_VIEW", "View active sessions and devices", "DEVICE_MANAGEMENT");
-            Permission deviceKick = createPermission("DEVICE_KICK", "Terminate active sessions", "DEVICE_MANAGEMENT");
+        // Device/Session Management Permissions
+        Permission deviceView = createOrUpdatePermission("DEVICE_VIEW", "View active sessions and devices", "DEVICE_MANAGEMENT");
+        Permission deviceKick = createOrUpdatePermission("DEVICE_KICK", "Terminate active sessions", "DEVICE_MANAGEMENT");
 
-            // System Configuration Permissions
-            Permission sysConfigView = createPermission("SYS_CONFIG_VIEW", "View system configurations", "SYSTEM_CONFIG");
-            Permission sysConfigEdit = createPermission("SYS_CONFIG_EDIT", "Edit system configurations", "SYSTEM_CONFIG");
-            
-            List<Permission> allPermissions = Arrays.asList(
-                    userView, userCreate, userUpdate, userDelete,
-                    roleView, roleCreate, roleUpdate, roleDelete, roleAssign,
-                    deviceView, deviceKick,
-                    sysConfigView, sysConfigEdit
-            );
-            
-            permissionRepository.saveAll(allPermissions);
+        // System Configuration Permissions
+        Permission sysConfigView = createOrUpdatePermission("SYS_CONFIG_VIEW", "View system configurations", "SYSTEM_CONFIG");
+        Permission sysConfigEdit = createOrUpdatePermission("SYS_CONFIG_EDIT", "Edit system configurations", "SYSTEM_CONFIG");
+        
+        List<Permission> allPermissions = Arrays.asList(
+                userView, userCreate, userUpdate, userDelete,
+                roleView, roleCreate, roleUpdate, roleDelete, roleAssign,
+                deviceView, deviceKick,
+                sysConfigView, sysConfigEdit
+        );
+        
+        permissionRepository.saveAll(allPermissions);
 
-            System.out.println("Seeding roles...");
-            Role adminRole = createRole("ADMIN", "System Administrator");
-            // Admin gets all permissions
-            adminRole.setPermissions(new HashSet<>(allPermissions));
-            roleRepository.save(adminRole);
+        System.out.println("Seeding/Updating roles...");
+        Role adminRole = createOrUpdateRole("ADMIN", "System Administrator");
+        // Admin gets all permissions
+        adminRole.setPermissions(new HashSet<>(allPermissions));
+        roleRepository.save(adminRole);
 
-            Role userRole = createRole("USER", "Standard User");
-            // Standard User gets basic view permissions
-            userRole.setPermissions(new HashSet<>(Arrays.asList(userView, deviceView)));
-            roleRepository.save(userRole);
-        } else {
-            System.out.println("Permissions and roles already seeded. Skipping...");
-        }
+        Role userRole = createOrUpdateRole("USER", "Standard User");
+        // Standard User gets basic view permissions
+        userRole.setPermissions(new HashSet<>(Arrays.asList(deviceView)));
+        roleRepository.save(userRole);
     }
 
-    private Permission createPermission(String name, String description, String module) {
-        Permission p = new Permission();
+    private Permission createOrUpdatePermission(String name, String description, String module) {
+        Permission p = permissionRepository.findByName(name).orElseGet(Permission::new);
         p.setName(name);
         p.setDescription(description);
         p.setModule(module);
         return p;
     }
 
-    private Role createRole(String name, String description) {
-        Role r = new Role();
+    private Role createOrUpdateRole(String name, String description) {
+        Role r = roleRepository.findByName(name).orElseGet(Role::new);
         r.setName(name);
         r.setDescription(description);
         return r;
@@ -139,7 +135,7 @@ public class DatabaseSeeder implements ApplicationRunner {
             for (int i = 0; i < 2; i++) {
                 User randomUser = new User();
                 randomUser.setUsername(faker.name().username());
-                randomUser.setPassword(passwordEncoder.encode("password"));
+                randomUser.setPassword(passwordEncoder.encode("123"));
                 randomUser.setEmail(faker.internet().emailAddress());
                 if (userRole != null) {
                     randomUser.setRoles(new HashSet<>(Arrays.asList(userRole)));
