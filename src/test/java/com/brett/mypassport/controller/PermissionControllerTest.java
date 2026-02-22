@@ -16,7 +16,10 @@ import com.brett.mypassport.config.RsaKeyProperties;
 
 import java.util.Arrays;
 import java.util.List;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -53,14 +56,17 @@ public class PermissionControllerTest {
         perm2.setModule("ROLE_MANAGEMENT");
 
         List<PermissionResponse> permissions = Arrays.asList(perm1, perm2);
+        Page<PermissionResponse> permissionPage = new PageImpl<>(permissions);
 
-        when(permissionService.getAllPermissions()).thenReturn(permissions);
+        when(permissionService.getAllPermissions(any(Pageable.class))).thenReturn(permissionPage);
 
         mockMvc.perform(get("/api/v1/permissions")
+                .param("page", "0")
+                .param("size", "10")
                 .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
-                .andExpect(jsonPath("$.data[0].name").value("USER_CREATE"))
-                .andExpect(jsonPath("$.data[1].name").value("PERMISSION_VIEW"));
+                .andExpect(jsonPath("$.data.content[0].name").value("USER_CREATE"))
+                .andExpect(jsonPath("$.data.content[1].name").value("PERMISSION_VIEW"));
     }
 }

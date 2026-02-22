@@ -17,6 +17,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.brett.mypassport.config.SecurityConfig;
 import com.brett.mypassport.config.RsaKeyProperties;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -86,15 +90,18 @@ public class RoleControllerTest {
         role2.setName("USER");
 
         List<RoleResponse> roles = Arrays.asList(role1, role2);
+        Page<RoleResponse> rolePage = new PageImpl<>(roles);
 
-        when(roleService.getAllRoles()).thenReturn(roles);
+        when(roleService.getAllRoles(any(Pageable.class))).thenReturn(rolePage);
 
         mockMvc.perform(get("/api/v1/roles")
+                .param("page", "0")
+                .param("size", "10")
                 .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
-                .andExpect(jsonPath("$.data[0].name").value("ADMIN"))
-                .andExpect(jsonPath("$.data[1].name").value("USER"));
+                .andExpect(jsonPath("$.data.content[0].name").value("ADMIN"))
+                .andExpect(jsonPath("$.data.content[1].name").value("USER"));
     }
 
     @Test
