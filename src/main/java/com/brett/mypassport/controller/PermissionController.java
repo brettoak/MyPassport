@@ -25,7 +25,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
-@RequestMapping(ApiConstants.API_V1 + "/permissions")
+@RequestMapping(value = ApiConstants.API_V1 + "/permissions", produces = "application/json")
 @Tag(name = "Permission", description = "APIs for Permission management (RBAC)")
 @SecurityRequirement(name = "bearerAuth")
 @Validated

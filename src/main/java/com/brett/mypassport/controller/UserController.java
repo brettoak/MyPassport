@@ -36,7 +36,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Max;
 
 @RestController
-@RequestMapping(ApiConstants.API_V1 + "/users")
+@RequestMapping(value = ApiConstants.API_V1 + "/users", produces = "application/json")
 @Tag(name = "User", description = "APIs for user management")
 @Validated
 public class UserController {

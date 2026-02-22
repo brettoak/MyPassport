@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(ApiConstants.API_V1 + "/system")
+@RequestMapping(value = ApiConstants.API_V1 + "/system", produces = "application/json")
 @Tag(name = "System", description = "APIs for System Administration")
 @SecurityRequirement(name = "bearerAuth")
 public class SystemController {

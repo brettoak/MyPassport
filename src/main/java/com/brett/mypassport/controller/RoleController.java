@@ -24,7 +24,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 @RestController
-@RequestMapping(ApiConstants.API_V1 + "/roles")
+@RequestMapping(value = ApiConstants.API_V1 + "/roles", produces = "application/json")
 @Tag(name = "Role", description = "APIs for Role management (RBAC)")
 // For now, requiring bearerAuth for all Role APIs. Later, you can restrict this to admins only.
 @SecurityRequirement(name = "bearerAuth") 

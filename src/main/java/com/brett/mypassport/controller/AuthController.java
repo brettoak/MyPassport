@@ -32,9 +32,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import org.springframework.validation.annotation.Validated;
+import jakarta.validation.Valid;
+
 @RestController
-@RequestMapping(ApiConstants.API_V1 + "/auth")
+@RequestMapping(value = ApiConstants.API_V1 + "/auth", produces = "application/json")
 @Tag(name = "Authentication", description = "APIs for user authentication and verification")
+@Validated
 public class AuthController {
 
     @Autowired
@@ -79,10 +83,7 @@ public class AuthController {
     })
     @Order(2)
     @PostMapping("/send-code")
-    public com.brett.mypassport.common.ApiResponse<String> sendCode(@RequestBody VerificationRequest request) {
-        if (request.getEmail() == null || request.getEmail().isEmpty()) {
-            throw new IllegalArgumentException("Email cannot be empty");
-        }
+    public com.brett.mypassport.common.ApiResponse<String> sendCode(@Valid @RequestBody VerificationRequest request) {
 
         verificationService.sendVerificationCode(request.getEmail());
         return com.brett.mypassport.common.ApiResponse.success("Verification code sent successfully.");
@@ -96,7 +97,7 @@ public class AuthController {
     })
     @Order(3)
     @PostMapping("/register")
-    public com.brett.mypassport.common.ApiResponse<String> register(@RequestBody RegisterRequest request) {
+    public com.brett.mypassport.common.ApiResponse<String> register(@Valid @RequestBody RegisterRequest request) {
         userService.registerUser(request);
         return com.brett.mypassport.common.ApiResponse.success("User registered successfully.");
     }
@@ -109,7 +110,7 @@ public class AuthController {
     })
     @Order(1)
     @PostMapping("/login")
-    public LoginResponse login(@RequestBody LoginRequest request, HttpServletRequest httpRequest) {
+    public LoginResponse login(@Valid @RequestBody LoginRequest request, HttpServletRequest httpRequest) {
         String ipAddress = httpRequest.getRemoteAddr();
         String deviceInfo = httpRequest.getHeader("User-Agent");
         return userService.login(request, ipAddress, deviceInfo);
@@ -171,10 +172,7 @@ public class AuthController {
     })
     @Order(4)
     @PostMapping("/forgot-password")
-    public com.brett.mypassport.common.ApiResponse<String> forgotPassword(@RequestBody VerificationRequest request) {
-        if (request.getEmail() == null || request.getEmail().isEmpty()) {
-            throw new IllegalArgumentException("Email cannot be empty");
-        }
+    public com.brett.mypassport.common.ApiResponse<String> forgotPassword(@Valid @RequestBody VerificationRequest request) {
 
         userService.requestPasswordReset(request.getEmail());
         return com.brett.mypassport.common.ApiResponse.success("Verification code sent successfully.");
@@ -188,7 +186,7 @@ public class AuthController {
     })
     @Order(5)
     @PostMapping("/reset-password")
-    public com.brett.mypassport.common.ApiResponse<String> resetPassword(@RequestBody ResetPasswordRequest request) {
+    public com.brett.mypassport.common.ApiResponse<String> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
         userService.resetPassword(request);
         return com.brett.mypassport.common.ApiResponse.success("Password reset successfully.");
     }
