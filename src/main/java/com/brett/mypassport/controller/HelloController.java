@@ -21,14 +21,11 @@ public class HelloController {
     @Operation(summary = "Echo message", description = "Returns the input message if it is within 20 characters.")
     @Order(999) // Ensure this controller is loaded after all other controllers
     @GetMapping("/hello")
-    public String hello(@RequestParam @Size(max = 20) String message) {
-
-        return """
-                {
-                  "message": "your message is: %s",
-                  "status": "success"
-                }
-                """.formatted(message);
+    public java.util.Map<String, String> hello(@RequestParam(required = false, defaultValue = "guest") @Size(max = 20) String message) {
+        return java.util.Map.of(
+            "message", "your message is: " + message,
+            "status", "success"
+        );
     }
 
 }
