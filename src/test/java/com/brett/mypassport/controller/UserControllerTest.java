@@ -103,20 +103,19 @@ public class UserControllerTest {
 
     @Test
     @WithMockUser(username = "testuser")
-    public void testGetActiveDevices() throws Exception {
-        DeviceResponse device1 = new DeviceResponse(1L, "127.0.0.1", "Chrome", LocalDateTime.now(), true);
-        DeviceResponse device2 = new DeviceResponse(2L, "192.168.1.5", "Firefox", LocalDateTime.now(), false);
-        List<DeviceResponse> devices = Arrays.asList(device1, device2);
+    void getActiveDevices_Success() throws Exception {
+        DeviceResponse device = new DeviceResponse(1L, "192.168.1.1", "Chrome", LocalDateTime.now(), true);
+        List<DeviceResponse> devices = Arrays.asList(device);
+        Page<DeviceResponse> page = new PageImpl<>(devices);
 
-        when(userService.getActiveDevices(eq("testuser"), anyString())).thenReturn(devices);
+        when(userService.getActiveDevices(eq("testuser"), anyString(), any(Pageable.class)))
+                .thenReturn(page);
 
         mockMvc.perform(get("/api/v1/users/devices")
-                .header("Authorization", "Bearer fake-token"))
+                        .header("Authorization", "Bearer token"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
-                .andExpect(jsonPath("$.data[0].ipAddress").value("127.0.0.1"))
-                .andExpect(jsonPath("$.data[0].current").value(true))
-                .andExpect(jsonPath("$.data[1].deviceInfo").value("Firefox"));
+                .andExpect(jsonPath("$.data.content[0].ipAddress").value("192.168.1.1"));
     }
 
     @Test

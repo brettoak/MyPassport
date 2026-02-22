@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import com.brett.mypassport.dto.DeviceResponse;
+import org.springframework.data.domain.Page;
 import org.springframework.core.annotation.Order;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -85,12 +86,17 @@ public class UserController {
     })
     @Order(12)
     @GetMapping("/devices")
-    public List<DeviceResponse> getActiveDevices(@AuthenticationPrincipal UserDetails userDetails, HttpServletRequest request) {
+    public Page<DeviceResponse> getActiveDevices(
+            @AuthenticationPrincipal UserDetails userDetails,
+            HttpServletRequest request,
+            @RequestParam(defaultValue = "0") @Min(value = 0, message = "Page index must not be less than zero") int page,
+            @RequestParam(defaultValue = "10") @Min(value = 0, message = "Page size must not be less than zero") @Max(value = 30, message = "Page size must not be greater than 30") int size) {
         if (userDetails == null) {
             throw new org.springframework.security.access.AccessDeniedException("User not authenticated");
         }
         String token = request.getHeader("Authorization");
-        return userService.getActiveDevices(userDetails.getUsername(), token);
+        Pageable pageable = PageRequest.of(page, size);
+        return userService.getActiveDevices(userDetails.getUsername(), token, pageable);
     }
 
     @Operation(summary = "Kick Device", description = "Revokes the session for a specific device/token.")

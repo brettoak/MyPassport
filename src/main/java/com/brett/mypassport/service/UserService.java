@@ -349,22 +349,21 @@ public class UserService implements UserDetailsService {
         userRepository.save(user);
     }
 
-    public List<com.brett.mypassport.dto.DeviceResponse> getActiveDevices(String username, String currentToken) {
+    public Page<com.brett.mypassport.dto.DeviceResponse> getActiveDevices(String username, String currentToken, Pageable pageable) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
         
         // Remove "Bearer " if present to match stored token
         String tokenValue = currentToken.startsWith("Bearer ") ? currentToken.substring(7) : currentToken;
 
-        return tokenRepository.findAllValidTokensByUser(user.getId()).stream()
+        return tokenRepository.findAllValidTokensByUser(user.getId(), pageable)
                 .map(token -> new com.brett.mypassport.dto.DeviceResponse(
                         token.getId(),
                         token.getIpAddress(),
                         token.getDeviceInfo(),
                         token.getCreatedAt(), // Assuming created_at is strictly when session started. Ideally last_used.
                         token.getToken().equals(tokenValue)
-                ))
-                .collect(java.util.stream.Collectors.toList());
+                ));
     }
 
     @Transactional
