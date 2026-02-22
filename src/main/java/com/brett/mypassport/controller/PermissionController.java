@@ -16,21 +16,33 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.security.access.prepost.PreAuthorize;
 import java.util.List;
 
+import org.springframework.validation.annotation.Validated;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Max;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.web.bind.annotation.RequestParam;
+
 @RestController
 @RequestMapping(ApiConstants.API_V1 + "/permissions")
 @Tag(name = "Permission", description = "APIs for Permission management (RBAC)")
 @SecurityRequirement(name = "bearerAuth")
+@Validated
 public class PermissionController {
 
     @Autowired
     private PermissionService permissionService;
 
-    @Operation(summary = "Get All Permissions", description = "Retrieves a list of all predefined system permissions.")
+    @Operation(summary = "Get All Permissions", description = "Retrieves a paginated list of all predefined system permissions.")
     @ApiResponse(responseCode = "200", description = "Permissions retrieved successfully")
     @Order(30)
     @PreAuthorize("hasAuthority(T(com.brett.mypassport.common.PermissionConstants).PERMISSION_VIEW)")
     @GetMapping
-    public List<PermissionResponse> getAllPermissions() {
-        return permissionService.getAllPermissions();
+    public Page<PermissionResponse> getAllPermissions(
+            @RequestParam(defaultValue = "0") @Min(value = 0, message = "Page index must not be less than zero") int page,
+            @RequestParam(defaultValue = "10") @Min(value = 0, message = "Page size must not be less than zero") @Max(value = 30, message = "Page size must not be greater than 30") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return permissionService.getAllPermissions(pageable);
     }
 }

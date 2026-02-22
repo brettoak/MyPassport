@@ -9,6 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Service
 public class PermissionService {
@@ -18,13 +20,12 @@ public class PermissionService {
 
     /**
      * Retrieve all permissions in the system.
-     * @return List of all mapping permissions
+     * @return Page of all mapping permissions
      */
     @Transactional(readOnly = true)
-    public List<PermissionResponse> getAllPermissions() {
-        return permissionRepository.findAll().stream()
-                .map(this::mapToResponse)
-                .collect(Collectors.toList());
+    public Page<PermissionResponse> getAllPermissions(Pageable pageable) {
+        return permissionRepository.findAll(pageable)
+                .map(this::mapToResponse);
     }
 
     /**
