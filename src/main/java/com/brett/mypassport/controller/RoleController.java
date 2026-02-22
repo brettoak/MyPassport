@@ -72,9 +72,9 @@ public class RoleController {
     @Order(22)
     @PreAuthorize("hasAuthority(T(com.brett.mypassport.common.PermissionConstants).ROLE_DELETE)")
     @DeleteMapping("/{id}")
-    public String deleteRole(@PathVariable Long id) {
+    public com.brett.mypassport.common.ApiResponse<String> deleteRole(@PathVariable Long id) {
         roleService.deleteRole(id);
-        return "Role deleted successfully";
+        return com.brett.mypassport.common.ApiResponse.success("Role deleted successfully");
     }
 
     @Operation(summary = "Get All Roles", description = "Retrieves a paginated list of all roles in the system.")
@@ -109,8 +109,8 @@ public class RoleController {
     @Order(25)
     @PreAuthorize("hasAuthority(T(com.brett.mypassport.common.PermissionConstants).ROLE_UPDATE)")
     @PostMapping("/{id}/permissions")
-    public String assignPermissions(@PathVariable Long id, @RequestBody RolePermissionRequest request) {
+    public com.brett.mypassport.common.ApiResponse<String> assignPermissions(@PathVariable Long id, @RequestBody RolePermissionRequest request) {
         roleService.assignPermissionsToRole(id, request.getPermissionIds());
-        return "Permissions assigned successfully";
+        return com.brett.mypassport.common.ApiResponse.success("Permissions assigned successfully");
     }
 }

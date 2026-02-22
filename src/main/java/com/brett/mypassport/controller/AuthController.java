@@ -79,13 +79,13 @@ public class AuthController {
     })
     @Order(2)
     @PostMapping("/send-code")
-    public String sendCode(@RequestBody VerificationRequest request) {
+    public com.brett.mypassport.common.ApiResponse<String> sendCode(@RequestBody VerificationRequest request) {
         if (request.getEmail() == null || request.getEmail().isEmpty()) {
             throw new IllegalArgumentException("Email cannot be empty");
         }
 
         verificationService.sendVerificationCode(request.getEmail());
-        return "Verification code sent successfully.";
+        return com.brett.mypassport.common.ApiResponse.success("Verification code sent successfully.");
     }
 
     @Operation(summary = "Register User", description = "Registers a new user. Requires a valid verification code sent to the email.")
@@ -96,9 +96,9 @@ public class AuthController {
     })
     @Order(3)
     @PostMapping("/register")
-    public String register(@RequestBody RegisterRequest request) {
+    public com.brett.mypassport.common.ApiResponse<String> register(@RequestBody RegisterRequest request) {
         userService.registerUser(request);
-        return "User registered successfully.";
+        return com.brett.mypassport.common.ApiResponse.success("User registered successfully.");
     }
 
     @Operation(summary = "Login User", description = "Authenticates a user and returns a JWT token.")
@@ -135,14 +135,14 @@ public class AuthController {
     })
     @Order(7)
     @PostMapping("/logout")
-    public String logout(@Parameter(hidden = true) @RequestHeader(value = "Authorization", required = false) String authHeader) {
+    public com.brett.mypassport.common.ApiResponse<String> logout(@Parameter(hidden = true) @RequestHeader(value = "Authorization", required = false) String authHeader) {
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             throw new IllegalArgumentException("Token is missing or invalid");
         }
 
         String token = authHeader.substring(7);
         userService.logout(token);
-        return "Logout successful";
+        return com.brett.mypassport.common.ApiResponse.success("Logout successful");
     }
 
     @Operation(summary = "Logout All Devices", description = "Invalidates all active tokens for the user.")
@@ -153,14 +153,14 @@ public class AuthController {
     })
     @Order(8)
     @PostMapping("/logout-all")
-    public String logoutAll(@Parameter(hidden = true) @RequestHeader(value = "Authorization", required = false) String authHeader) {
+    public com.brett.mypassport.common.ApiResponse<String> logoutAll(@Parameter(hidden = true) @RequestHeader(value = "Authorization", required = false) String authHeader) {
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             throw new IllegalArgumentException("Token is missing or invalid");
         }
 
         String token = authHeader.substring(7);
         userService.logoutAll(token);
-        return "All devices logged out successfully";
+        return com.brett.mypassport.common.ApiResponse.success("All devices logged out successfully");
     }
 
     @Operation(summary = "Forgot Password", description = "Sends a verification code to the user's email if the account exists.")
@@ -171,13 +171,13 @@ public class AuthController {
     })
     @Order(4)
     @PostMapping("/forgot-password")
-    public String forgotPassword(@RequestBody VerificationRequest request) {
+    public com.brett.mypassport.common.ApiResponse<String> forgotPassword(@RequestBody VerificationRequest request) {
         if (request.getEmail() == null || request.getEmail().isEmpty()) {
             throw new IllegalArgumentException("Email cannot be empty");
         }
 
         userService.requestPasswordReset(request.getEmail());
-        return "Verification code sent successfully.";
+        return com.brett.mypassport.common.ApiResponse.success("Verification code sent successfully.");
     }
 
     @Operation(summary = "Reset Password", description = "Resets the user's password using a valid verification code.")
@@ -188,8 +188,8 @@ public class AuthController {
     })
     @Order(5)
     @PostMapping("/reset-password")
-    public String resetPassword(@RequestBody ResetPasswordRequest request) {
+    public com.brett.mypassport.common.ApiResponse<String> resetPassword(@RequestBody ResetPasswordRequest request) {
         userService.resetPassword(request);
-        return "Password reset successfully.";
+        return com.brett.mypassport.common.ApiResponse.success("Password reset successfully.");
     }
 }

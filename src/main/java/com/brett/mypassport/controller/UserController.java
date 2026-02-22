@@ -69,12 +69,12 @@ public class UserController {
     })
     @Order(11)
     @PostMapping("/change-password")
-    public String changePassword(@AuthenticationPrincipal UserDetails userDetails, @RequestBody com.brett.mypassport.dto.ChangePasswordRequest request) {
+    public com.brett.mypassport.common.ApiResponse<String> changePassword(@AuthenticationPrincipal UserDetails userDetails, @RequestBody com.brett.mypassport.dto.ChangePasswordRequest request) {
         if (userDetails == null) {
             throw new org.springframework.security.access.AccessDeniedException("User not authenticated");
         }
         userService.changePassword(userDetails.getUsername(), request);
-        return "Password changed successfully";
+        return com.brett.mypassport.common.ApiResponse.success("Password changed successfully");
     }
 
     @Operation(summary = "Get Active Devices", description = "Retrieves a list of active devices (sessions) for the user.")
@@ -108,13 +108,13 @@ public class UserController {
     })
     @Order(13)
     @DeleteMapping("/devices/{tokenId}")
-    public String kickDevice(@AuthenticationPrincipal UserDetails userDetails, @PathVariable Long tokenId, HttpServletRequest request) {
+    public com.brett.mypassport.common.ApiResponse<String> kickDevice(@AuthenticationPrincipal UserDetails userDetails, @PathVariable Long tokenId, HttpServletRequest request) {
         if (userDetails == null) {
             throw new org.springframework.security.access.AccessDeniedException("User not authenticated");
         }
         String token = request.getHeader("Authorization");
         userService.revokeDevice(tokenId, userDetails.getUsername(), token);
-        return "Device kicked successfully";
+        return com.brett.mypassport.common.ApiResponse.success("Device kicked successfully");
     }
 
     @Operation(summary = "Assign Roles to User", description = "Replaces the current roles of a user with a new set of roles.")
@@ -126,9 +126,9 @@ public class UserController {
     @Order(14)
     @PreAuthorize("hasAuthority(T(com.brett.mypassport.common.PermissionConstants).ROLE_ASSIGN)")
     @PostMapping("/{id}/roles")
-    public String assignRoles(@PathVariable Long id, @RequestBody UserRoleRequest request) {
+    public com.brett.mypassport.common.ApiResponse<String> assignRoles(@PathVariable Long id, @RequestBody UserRoleRequest request) {
         userService.assignRolesToUser(id, request.getRoleIds());
-        return "Roles assigned successfully";
+        return com.brett.mypassport.common.ApiResponse.success("Roles assigned successfully");
     }
 
     @Operation(summary = "Get All Users", description = "Retrieves a paginated list of all users. Requires USER_VIEW permission.")
