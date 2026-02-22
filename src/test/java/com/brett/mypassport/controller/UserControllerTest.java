@@ -6,6 +6,7 @@ import com.brett.mypassport.dto.UserResponse;
 import com.brett.mypassport.dto.UserRoleRequest;
 import com.brett.mypassport.service.UserService;
 import com.brett.mypassport.common.JwtUtil;
+import com.brett.mypassport.common.PermissionConstants;
 import java.util.Arrays;
 import java.util.List;
 import org.springframework.data.domain.PageImpl;
@@ -155,7 +156,7 @@ public class UserControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "admin", authorities = {"ROLE_ASSIGN"})
+    @WithMockUser(username = "admin", authorities = {PermissionConstants.ROLE_ASSIGN})
     public void testAssignRolesSuccess() throws Exception {
         UserRoleRequest request = new UserRoleRequest();
         request.setRoleIds(Arrays.asList(1L, 2L));
@@ -172,7 +173,7 @@ public class UserControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "admin", authorities = {"USER_VIEW"})
+    @WithMockUser(username = "admin", authorities = {PermissionConstants.USER_VIEW})
     public void testGetAllUsersSuccess() throws Exception {
         UserResponse mockResponse = new UserResponse(
                 1L, "testuser", "test@example.com", LocalDateTime.now(), LocalDateTime.now(),
@@ -190,7 +191,7 @@ public class UserControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "admin", authorities = {"USER_VIEW"})
+    @WithMockUser(username = "admin", authorities = {PermissionConstants.USER_VIEW})
     public void testGetUserByIdSuccess() throws Exception {
         UserResponse mockResponse = new UserResponse(
                 1L, "testuser", "test@example.com", LocalDateTime.now(), LocalDateTime.now(),

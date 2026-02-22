@@ -3,6 +3,7 @@ package com.brett.mypassport.controller;
 import com.brett.mypassport.dto.PermissionResponse;
 import com.brett.mypassport.service.PermissionService;
 import com.brett.mypassport.common.JwtUtil;
+import com.brett.mypassport.common.PermissionConstants;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -39,7 +40,7 @@ public class PermissionControllerTest {
     private RsaKeyProperties rsaKeyProperties;
 
     @Test
-    @WithMockUser(username = "admin", authorities = {"ROLE_VIEW"})
+    @WithMockUser(username = "admin", authorities = {PermissionConstants.ROLE_VIEW})
     public void testGetAllPermissions() throws Exception {
         PermissionResponse perm1 = new PermissionResponse();
         perm1.setId(1L);

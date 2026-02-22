@@ -12,6 +12,7 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
+import com.brett.mypassport.common.PermissionConstants;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -44,25 +45,25 @@ public class DatabaseSeeder implements ApplicationRunner {
     private void seedPermissionsAndRoles() {
         System.out.println("Seeding/Updating permissions...");
         // User Management Permissions
-        Permission userView = createOrUpdatePermission("USER_VIEW", "View user details and lists", "USER_MANAGEMENT");
-        Permission userCreate = createOrUpdatePermission("USER_CREATE", "Create new users", "USER_MANAGEMENT");
-        Permission userUpdate = createOrUpdatePermission("USER_UPDATE", "Edit user details", "USER_MANAGEMENT");
-        Permission userDelete = createOrUpdatePermission("USER_DELETE", "Delete users", "USER_MANAGEMENT");
+        Permission userView = createOrUpdatePermission(PermissionConstants.USER_VIEW, "View user details and lists", "USER_MANAGEMENT");
+        Permission userCreate = createOrUpdatePermission(PermissionConstants.USER_CREATE, "Create new users", "USER_MANAGEMENT");
+        Permission userUpdate = createOrUpdatePermission(PermissionConstants.USER_UPDATE, "Edit user details", "USER_MANAGEMENT");
+        Permission userDelete = createOrUpdatePermission(PermissionConstants.USER_DELETE, "Delete users", "USER_MANAGEMENT");
 
         // Role Management Permissions
-        Permission roleView = createOrUpdatePermission("ROLE_VIEW", "View roles and permissions", "ROLE_MANAGEMENT");
-        Permission roleCreate = createOrUpdatePermission("ROLE_CREATE", "Create new roles", "ROLE_MANAGEMENT");
-        Permission roleUpdate = createOrUpdatePermission("ROLE_UPDATE", "Edit roles", "ROLE_MANAGEMENT");
-        Permission roleDelete = createOrUpdatePermission("ROLE_DELETE", "Delete roles", "ROLE_MANAGEMENT");
-        Permission roleAssign = createOrUpdatePermission("ROLE_ASSIGN", "Assign roles to users", "ROLE_MANAGEMENT");
+        Permission roleView = createOrUpdatePermission(PermissionConstants.ROLE_VIEW, "View roles and permissions", "ROLE_MANAGEMENT");
+        Permission roleCreate = createOrUpdatePermission(PermissionConstants.ROLE_CREATE, "Create new roles", "ROLE_MANAGEMENT");
+        Permission roleUpdate = createOrUpdatePermission(PermissionConstants.ROLE_UPDATE, "Edit roles", "ROLE_MANAGEMENT");
+        Permission roleDelete = createOrUpdatePermission(PermissionConstants.ROLE_DELETE, "Delete roles", "ROLE_MANAGEMENT");
+        Permission roleAssign = createOrUpdatePermission(PermissionConstants.ROLE_ASSIGN, "Assign roles to users", "ROLE_MANAGEMENT");
 
         // Device/Session Management Permissions
-        Permission deviceView = createOrUpdatePermission("DEVICE_VIEW", "View active sessions and devices", "DEVICE_MANAGEMENT");
-        Permission deviceKick = createOrUpdatePermission("DEVICE_KICK", "Terminate active sessions", "DEVICE_MANAGEMENT");
+        Permission deviceView = createOrUpdatePermission(PermissionConstants.DEVICE_VIEW, "View active sessions and devices", "DEVICE_MANAGEMENT");
+        Permission deviceKick = createOrUpdatePermission(PermissionConstants.DEVICE_KICK, "Terminate active sessions", "DEVICE_MANAGEMENT");
 
         // System Configuration Permissions
-        Permission sysConfigView = createOrUpdatePermission("SYS_CONFIG_VIEW", "View system configurations", "SYSTEM_CONFIG");
-        Permission sysConfigEdit = createOrUpdatePermission("SYS_CONFIG_EDIT", "Edit system configurations", "SYSTEM_CONFIG");
+        Permission sysConfigView = createOrUpdatePermission(PermissionConstants.SYS_CONFIG_VIEW, "View system configurations", "SYSTEM_CONFIG");
+        Permission sysConfigEdit = createOrUpdatePermission(PermissionConstants.SYS_CONFIG_EDIT, "Edit system configurations", "SYSTEM_CONFIG");
         
         List<Permission> allPermissions = Arrays.asList(
                 userView, userCreate, userUpdate, userDelete,

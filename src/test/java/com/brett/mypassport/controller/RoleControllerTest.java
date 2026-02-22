@@ -4,6 +4,7 @@ import com.brett.mypassport.dto.RoleRequest;
 import com.brett.mypassport.dto.RoleResponse;
 import com.brett.mypassport.service.RoleService;
 import com.brett.mypassport.common.JwtUtil;
+import com.brett.mypassport.common.PermissionConstants;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +50,7 @@ public class RoleControllerTest {
     private ObjectMapper objectMapper;
 
     @Test
-    @WithMockUser(username = "admin", authorities = {"ROLE_CREATE"})
+    @WithMockUser(username = "admin", authorities = {PermissionConstants.ROLE_CREATE})
     public void testCreateRole() throws Exception {
         RoleRequest request = new RoleRequest();
         request.setName("ADMIN");
@@ -74,7 +75,7 @@ public class RoleControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "admin", authorities = {"ROLE_VIEW"})
+    @WithMockUser(username = "admin", authorities = {PermissionConstants.ROLE_VIEW})
     public void testGetAllRoles() throws Exception {
         RoleResponse role1 = new RoleResponse();
         role1.setId(1L);
@@ -97,7 +98,7 @@ public class RoleControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "admin", authorities = {"ROLE_VIEW"})
+    @WithMockUser(username = "admin", authorities = {PermissionConstants.ROLE_VIEW})
     public void testGetRoleById() throws Exception {
         RoleResponse role = new RoleResponse();
         role.setId(1L);
@@ -113,7 +114,7 @@ public class RoleControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "admin", authorities = {"ROLE_UPDATE"})
+    @WithMockUser(username = "admin", authorities = {PermissionConstants.ROLE_UPDATE})
     public void testUpdateRole() throws Exception {
         RoleRequest request = new RoleRequest();
         request.setName("SUPER_ADMIN");
@@ -137,7 +138,7 @@ public class RoleControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "admin", authorities = {"ROLE_DELETE"})
+    @WithMockUser(username = "admin", authorities = {PermissionConstants.ROLE_DELETE})
     public void testDeleteRole() throws Exception {
         doNothing().when(roleService).deleteRole(1L);
 

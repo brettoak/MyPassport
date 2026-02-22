@@ -114,7 +114,7 @@ public class UserController {
             @ApiResponse(responseCode = "400", description = "User not found or invalid roles")
     })
     @Order(14)
-    @PreAuthorize("hasAuthority('ROLE_ASSIGN')")
+    @PreAuthorize("hasAuthority(T(com.brett.mypassport.common.PermissionConstants).ROLE_ASSIGN)")
     @PostMapping("/{id}/roles")
     public String assignRoles(@PathVariable Long id, @RequestBody UserRoleRequest request) {
         userService.assignRolesToUser(id, request.getRoleIds());
@@ -128,7 +128,7 @@ public class UserController {
             @ApiResponse(responseCode = "403", description = "Unauthorized access")
     })
     @Order(15)
-    @PreAuthorize("hasAuthority('USER_VIEW')")
+    @PreAuthorize("hasAuthority(T(com.brett.mypassport.common.PermissionConstants).USER_VIEW)")
     @GetMapping
     public Page<UserResponse> getAllUsers(
             @RequestParam(defaultValue = "0") int page,
@@ -145,7 +145,7 @@ public class UserController {
             @ApiResponse(responseCode = "403", description = "Unauthorized access")
     })
     @Order(16)
-    @PreAuthorize("hasAuthority('USER_VIEW')")
+    @PreAuthorize("hasAuthority(T(com.brett.mypassport.common.PermissionConstants).USER_VIEW)")
     @GetMapping("/{id}")
     public UserResponse getUserById(@PathVariable Long id) {
         return userService.getUserById(id);
