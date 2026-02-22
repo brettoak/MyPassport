@@ -114,7 +114,7 @@ public class UserController {
             @ApiResponse(responseCode = "400", description = "User not found or invalid roles")
     })
     @Order(14)
-    @PreAuthorize("hasAuthority('ROLE_MANAGE')")
+    @PreAuthorize("hasAuthority('ROLE_ASSIGN')")
     @PostMapping("/{id}/roles")
     public String assignRoles(@PathVariable Long id, @RequestBody UserRoleRequest request) {
         userService.assignRolesToUser(id, request.getRoleIds());

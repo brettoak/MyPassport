@@ -47,6 +47,7 @@ public class AuthController {
     private RsaKeyProperties rsaKeyProperties;
 
     @Operation(summary = "Get Public Key", description = "Returns the RSA Public Key for token verification.")
+    @Order(10)
     @GetMapping("/public-key")
     public Map<String, String> getPublicKey() {
         RSAPublicKey publicKey = rsaKeyProperties.getPublicKey();
@@ -61,6 +62,7 @@ public class AuthController {
             @ApiResponse(responseCode = "200", description = "Token validation result returned"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
+    @Order(9)
     @PostMapping("/check-token")
     public Map<String, Object> checkToken(@RequestBody TokenValidationRequest request) {
         if (request.getToken() == null || request.getToken().isEmpty()) {

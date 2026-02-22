@@ -33,7 +33,7 @@ public class RoleController {
             @ApiResponse(responseCode = "400", description = "Invalid request or role already exists")
     })
     @Order(20)
-    @PreAuthorize("hasAuthority('ROLE_MANAGE')")
+    @PreAuthorize("hasAuthority('ROLE_CREATE')")
     @PostMapping
     public RoleResponse createRole(@RequestBody RoleRequest request) {
         if (request.getName() == null || request.getName().trim().isEmpty()) {
@@ -48,7 +48,7 @@ public class RoleController {
             @ApiResponse(responseCode = "400", description = "Invalid request or role not found")
     })
     @Order(21)
-    @PreAuthorize("hasAuthority('ROLE_MANAGE')")
+    @PreAuthorize("hasAuthority('ROLE_UPDATE')")
     @PutMapping("/{id}")
     public RoleResponse updateRole(@PathVariable Long id, @RequestBody RoleRequest request) {
         if (request.getName() == null || request.getName().trim().isEmpty()) {
@@ -63,7 +63,7 @@ public class RoleController {
             @ApiResponse(responseCode = "400", description = "Role not found")
     })
     @Order(22)
-    @PreAuthorize("hasAuthority('ROLE_MANAGE')")
+    @PreAuthorize("hasAuthority('ROLE_DELETE')")
     @DeleteMapping("/{id}")
     public String deleteRole(@PathVariable Long id) {
         roleService.deleteRole(id);
@@ -73,7 +73,7 @@ public class RoleController {
     @Operation(summary = "Get All Roles", description = "Retrieves a list of all roles in the system.")
     @ApiResponse(responseCode = "200", description = "Roles retrieved successfully")
     @Order(23)
-    @PreAuthorize("hasAuthority('ROLE_MANAGE')")
+    @PreAuthorize("hasAuthority('ROLE_VIEW')")
     @GetMapping
     public List<RoleResponse> getAllRoles() {
         return roleService.getAllRoles();
@@ -85,7 +85,7 @@ public class RoleController {
             @ApiResponse(responseCode = "400", description = "Role not found")
     })
     @Order(24)
-    @PreAuthorize("hasAuthority('ROLE_MANAGE')")
+    @PreAuthorize("hasAuthority('ROLE_VIEW')")
     @GetMapping("/{id}")
     public RoleResponse getRoleById(@PathVariable Long id) {
         return roleService.getRoleById(id);
@@ -97,7 +97,7 @@ public class RoleController {
             @ApiResponse(responseCode = "400", description = "Role not found or invalid permissions")
     })
     @Order(25)
-    @PreAuthorize("hasAuthority('ROLE_MANAGE')")
+    @PreAuthorize("hasAuthority('ROLE_UPDATE')")
     @PostMapping("/{id}/permissions")
     public String assignPermissions(@PathVariable Long id, @RequestBody RolePermissionRequest request) {
         roleService.assignPermissionsToRole(id, request.getPermissionIds());
