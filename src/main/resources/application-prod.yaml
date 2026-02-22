@@ -13,6 +13,8 @@ spring:
       host: ${PROD_REDIS_HOST:prod-redis-server}
       port: ${PROD_REDIS_PORT:6379}
       password: ${PROD_REDIS_PASSWORD:}
+  flyway:
+    clean-disabled: false
   mail:
     host: ${PROD_MAIL_HOST:smtp.sendgrid.net}
     port: ${PROD_MAIL_PORT:587}
