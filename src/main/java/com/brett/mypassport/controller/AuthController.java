@@ -68,10 +68,7 @@ public class AuthController {
     })
     @Order(9)
     @PostMapping("/check-token")
-    public Map<String, Object> checkToken(@RequestBody TokenValidationRequest request) {
-        if (request.getToken() == null || request.getToken().isEmpty()) {
-             return Map.of("valid", false, "reason", "Token is empty");
-        }
+    public Map<String, Object> checkToken(@Valid @RequestBody TokenValidationRequest request) {
         return userService.validateToken(request.getToken());
     }
 

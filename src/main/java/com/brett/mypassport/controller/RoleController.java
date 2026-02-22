@@ -22,6 +22,7 @@ import jakarta.validation.constraints.Max;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping(value = ApiConstants.API_V1 + "/roles", produces = "application/json")
@@ -42,10 +43,7 @@ public class RoleController {
     @Order(20)
     @PreAuthorize("hasAuthority(T(com.brett.mypassport.common.PermissionConstants).ROLE_CREATE)")
     @PostMapping
-    public RoleResponse createRole(@RequestBody RoleRequest request) {
-        if (request.getName() == null || request.getName().trim().isEmpty()) {
-            throw new IllegalArgumentException("Role name cannot be empty");
-        }
+    public RoleResponse createRole(@Valid @RequestBody RoleRequest request) {
         return roleService.createRole(request);
     }
 
@@ -57,10 +55,7 @@ public class RoleController {
     @Order(21)
     @PreAuthorize("hasAuthority(T(com.brett.mypassport.common.PermissionConstants).ROLE_UPDATE)")
     @PutMapping("/{id}")
-    public RoleResponse updateRole(@PathVariable Long id, @RequestBody RoleRequest request) {
-        if (request.getName() == null || request.getName().trim().isEmpty()) {
-            throw new IllegalArgumentException("Role name cannot be empty");
-        }
+    public RoleResponse updateRole(@PathVariable Long id, @Valid @RequestBody RoleRequest request) {
         return roleService.updateRole(id, request);
     }
 
@@ -109,7 +104,7 @@ public class RoleController {
     @Order(25)
     @PreAuthorize("hasAuthority(T(com.brett.mypassport.common.PermissionConstants).ROLE_UPDATE)")
     @PostMapping("/{id}/permissions")
-    public com.brett.mypassport.common.ApiResponse<String> assignPermissions(@PathVariable Long id, @RequestBody RolePermissionRequest request) {
+    public com.brett.mypassport.common.ApiResponse<String> assignPermissions(@PathVariable Long id, @Valid @RequestBody RolePermissionRequest request) {
         roleService.assignPermissionsToRole(id, request.getPermissionIds());
         return com.brett.mypassport.common.ApiResponse.success("Permissions assigned successfully");
     }

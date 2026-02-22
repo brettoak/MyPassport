@@ -1,12 +1,17 @@
 package com.brett.mypassport.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 
 public class LoginRequest {
     @Schema(description = "User email address", example = "user@example.com")
+    @NotBlank(message = "Email cannot be empty")
+    @Email(message = "Invalid email format")
     private String email;
     
     @Schema(description = "User password", example = "123")
+    @NotBlank(message = "Password cannot be empty")
     private String password;
 
     // Getters and Setters

@@ -34,6 +34,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.validation.annotation.Validated;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Max;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping(value = ApiConstants.API_V1 + "/users", produces = "application/json")
@@ -69,7 +70,7 @@ public class UserController {
     })
     @Order(11)
     @PostMapping("/change-password")
-    public com.brett.mypassport.common.ApiResponse<String> changePassword(@AuthenticationPrincipal UserDetails userDetails, @RequestBody com.brett.mypassport.dto.ChangePasswordRequest request) {
+    public com.brett.mypassport.common.ApiResponse<String> changePassword(@AuthenticationPrincipal UserDetails userDetails, @Valid @RequestBody com.brett.mypassport.dto.ChangePasswordRequest request) {
         if (userDetails == null) {
             throw new org.springframework.security.access.AccessDeniedException("User not authenticated");
         }
@@ -126,7 +127,7 @@ public class UserController {
     @Order(14)
     @PreAuthorize("hasAuthority(T(com.brett.mypassport.common.PermissionConstants).ROLE_ASSIGN)")
     @PostMapping("/{id}/roles")
-    public com.brett.mypassport.common.ApiResponse<String> assignRoles(@PathVariable Long id, @RequestBody UserRoleRequest request) {
+    public com.brett.mypassport.common.ApiResponse<String> assignRoles(@PathVariable Long id, @Valid @RequestBody UserRoleRequest request) {
         userService.assignRolesToUser(id, request.getRoleIds());
         return com.brett.mypassport.common.ApiResponse.success("Roles assigned successfully");
     }
