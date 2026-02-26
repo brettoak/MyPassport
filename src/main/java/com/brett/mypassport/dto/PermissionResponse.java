@@ -17,6 +17,9 @@ public class PermissionResponse {
     @Schema(description = "The module this permission belongs to", example = "USER_MANAGEMENT")
     private String module;
 
+    @Schema(description = "The system this permission belongs to", example = "sys-b")
+    private String sysCode;
+
     // Getters and Setters
 
     public Long getId() {
@@ -49,5 +52,13 @@ public class PermissionResponse {
 
     public void setModule(String module) {
         this.module = module;
+    }
+
+    public String getSysCode() {
+        return sysCode;
+    }
+
+    public void setSysCode(String sysCode) {
+        this.sysCode = sysCode;
     }
 }

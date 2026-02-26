@@ -92,7 +92,7 @@ public class RoleControllerTest {
         List<RoleResponse> roles = Arrays.asList(role1, role2);
         Page<RoleResponse> rolePage = new PageImpl<>(roles);
 
-        when(roleService.getAllRoles(any(Pageable.class))).thenReturn(rolePage);
+        when(roleService.getAllRoles(any(), any(Pageable.class))).thenReturn(rolePage);
 
         mockMvc.perform(get("/api/v1/roles")
                 .param("page", "0")

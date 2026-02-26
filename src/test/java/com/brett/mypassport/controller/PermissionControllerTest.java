@@ -58,7 +58,7 @@ public class PermissionControllerTest {
         List<PermissionResponse> permissions = Arrays.asList(perm1, perm2);
         Page<PermissionResponse> permissionPage = new PageImpl<>(permissions);
 
-        when(permissionService.getAllPermissions(any(Pageable.class))).thenReturn(permissionPage);
+        when(permissionService.getAllPermissions(any(), any(Pageable.class))).thenReturn(permissionPage);
 
         mockMvc.perform(get("/api/v1/permissions")
                 .param("page", "0")

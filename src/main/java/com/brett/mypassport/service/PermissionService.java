@@ -23,7 +23,11 @@ public class PermissionService {
      * @return Page of all mapping permissions
      */
     @Transactional(readOnly = true)
-    public Page<PermissionResponse> getAllPermissions(Pageable pageable) {
+    public Page<PermissionResponse> getAllPermissions(String sysCode, Pageable pageable) {
+        if (sysCode != null && !sysCode.isEmpty()) {
+            return permissionRepository.findBySysCode(sysCode, pageable)
+                    .map(this::mapToResponse);
+        }
         return permissionRepository.findAll(pageable)
                 .map(this::mapToResponse);
     }
@@ -37,6 +41,7 @@ public class PermissionService {
         response.setName(permission.getName());
         response.setDescription(permission.getDescription());
         response.setModule(permission.getModule());
+        response.setSysCode(permission.getSysCode());
         return response;
     }
 }

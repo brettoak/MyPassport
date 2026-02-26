@@ -23,6 +23,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import jakarta.validation.Valid;
+import io.swagger.v3.oas.annotations.Parameter;
 
 @RestController
 @RequestMapping(value = ApiConstants.API_V1 + "/roles", produces = "application/json")
@@ -78,10 +79,11 @@ public class RoleController {
     @PreAuthorize("hasAuthority(T(com.brett.mypassport.common.PermissionConstants).ROLE_VIEW)")
     @GetMapping
     public Page<RoleResponse> getAllRoles(
+            @Parameter(description = "Optional system code to filter roles by", example = "sys-b") @RequestParam(required = false) String sysCode,
             @RequestParam(defaultValue = "0") @Min(value = 0, message = "Page index must not be less than zero") int page,
             @RequestParam(defaultValue = "10") @Min(value = 0, message = "Page size must not be less than zero") @Max(value = 30, message = "Page size must not be greater than 30") int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return roleService.getAllRoles(pageable);
+        return roleService.getAllRoles(sysCode, pageable);
     }
 
     @Operation(summary = "Get Role by ID", description = "Retrieves details of a specific role.")

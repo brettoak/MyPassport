@@ -18,6 +18,9 @@ public class RoleResponse {
     @Schema(description = "Timestamp when the role was created")
     private LocalDateTime createdAt;
 
+    @Schema(description = "The system this role belongs to", example = "sys-b")
+    private String sysCode;
+
     // Getters and Setters
 
     public Long getId() {
@@ -50,5 +53,13 @@ public class RoleResponse {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public String getSysCode() {
+        return sysCode;
+    }
+
+    public void setSysCode(String sysCode) {
+        this.sysCode = sysCode;
     }
 }

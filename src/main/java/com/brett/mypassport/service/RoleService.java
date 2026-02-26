@@ -33,13 +33,14 @@ public class RoleService {
      */
     @Transactional
     public RoleResponse createRole(RoleRequest request) {
-        if (roleRepository.existsByName(request.getName())) {
-            throw new IllegalArgumentException("Role with name '" + request.getName() + "' already exists");
+        if (roleRepository.existsByNameAndSysCode(request.getName(), request.getSysCode())) {
+            throw new IllegalArgumentException("Role with name '" + request.getName() + "' already exists in system '" + request.getSysCode() + "'");
         }
 
         Role role = new Role();
         role.setName(request.getName());
         role.setDescription(request.getDescription());
+        role.setSysCode(request.getSysCode());
 
         Role savedRole = roleRepository.save(role);
         return mapToResponse(savedRole);
@@ -56,12 +57,14 @@ public class RoleService {
         Role role = roleRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Role with ID " + id + " not found"));
 
-        if (!role.getName().equals(request.getName()) && roleRepository.existsByName(request.getName())) {
-            throw new IllegalArgumentException("Role with name '" + request.getName() + "' already exists");
+        if ((!role.getName().equals(request.getName()) || !role.getSysCode().equals(request.getSysCode())) 
+                && roleRepository.existsByNameAndSysCode(request.getName(), request.getSysCode())) {
+            throw new IllegalArgumentException("Role with name '" + request.getName() + "' already exists in system '" + request.getSysCode() + "'");
         }
 
         role.setName(request.getName());
         role.setDescription(request.getDescription());
+        role.setSysCode(request.getSysCode());
 
         Role updatedRole = roleRepository.save(role);
         return mapToResponse(updatedRole);
@@ -82,11 +85,15 @@ public class RoleService {
     }
 
     /**
-     * Retrieve all roles.
+     * Retrieve all roles, optionally filtered by sysCode.
      * @return Page of role responses
      */
     @Transactional(readOnly = true)
-    public Page<RoleResponse> getAllRoles(Pageable pageable) {
+    public Page<RoleResponse> getAllRoles(String sysCode, Pageable pageable) {
+        if (sysCode != null && !sysCode.isEmpty()) {
+            return roleRepository.findBySysCode(sysCode, pageable)
+                    .map(this::mapToResponse);
+        }
         return roleRepository.findAll(pageable)
                 .map(this::mapToResponse);
     }
@@ -136,6 +143,7 @@ public class RoleService {
         response.setName(role.getName());
         response.setDescription(role.getDescription());
         response.setCreatedAt(role.getCreatedAt());
+        response.setSysCode(role.getSysCode());
         return response;
     }
 }

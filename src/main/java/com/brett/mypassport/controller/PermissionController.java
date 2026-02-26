@@ -23,6 +23,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.RequestParam;
+import io.swagger.v3.oas.annotations.Parameter;
 
 @RestController
 @RequestMapping(value = ApiConstants.API_V1 + "/permissions", produces = "application/json")
@@ -40,9 +41,10 @@ public class PermissionController {
     @PreAuthorize("hasAuthority(T(com.brett.mypassport.common.PermissionConstants).PERMISSION_VIEW)")
     @GetMapping
     public Page<PermissionResponse> getAllPermissions(
+            @Parameter(description = "Optional system code to filter permissions by", example = "sys-b") @RequestParam(required = false) String sysCode,
             @RequestParam(defaultValue = "0") @Min(value = 0, message = "Page index must not be less than zero") int page,
             @RequestParam(defaultValue = "10") @Min(value = 0, message = "Page size must not be less than zero") @Max(value = 30, message = "Page size must not be greater than 30") int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return permissionService.getAllPermissions(pageable);
+        return permissionService.getAllPermissions(sysCode, pageable);
     }
 }

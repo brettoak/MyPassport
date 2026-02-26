@@ -22,4 +22,9 @@ public interface PermissionRepository extends JpaRepository<Permission, Long> {
      * @return An Optional containing the Permission if found
      */
     Optional<Permission> findByName(String name);
+
+    /**
+     * Find permissions by system code with pagination.
+     */
+    org.springframework.data.domain.Page<Permission> findBySysCode(String sysCode, org.springframework.data.domain.Pageable pageable);
 }

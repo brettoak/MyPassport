@@ -13,6 +13,10 @@ public class RoleRequest {
     @Schema(description = "A description of what this role entails", example = "Can edit content but cannot delete users")
     private String description;
 
+    @Schema(description = "The system this role belongs to", example = "sys-b")
+    @NotBlank(message = "System code cannot be empty")
+    private String sysCode;
+
     // Getters and Setters
 
     public String getName() {
@@ -29,5 +33,13 @@ public class RoleRequest {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getSysCode() {
+        return sysCode;
+    }
+
+    public void setSysCode(String sysCode) {
+        this.sysCode = sysCode;
     }
 }
