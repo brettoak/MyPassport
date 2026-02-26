@@ -8,6 +8,8 @@ import com.brett.mypassport.dto.RegisterRequest;
 import com.brett.mypassport.dto.ResetPasswordRequest;
 import com.brett.mypassport.dto.VerificationRequest;
 import com.brett.mypassport.dto.TokenValidationRequest;
+import com.brett.mypassport.dto.PermissionCheckRequest;
+import com.brett.mypassport.dto.PermissionCheckResponse;
 import com.brett.mypassport.service.UserService;
 import com.brett.mypassport.service.VerificationService;
 import com.brett.mypassport.config.RsaKeyProperties;
@@ -70,6 +72,17 @@ public class AuthController {
     @PostMapping("/check-token")
     public Map<String, Object> checkToken(@Valid @RequestBody TokenValidationRequest request) {
         return userService.validateToken(request.getToken());
+    }
+
+    @Operation(summary = "Check Permission", description = "Validates the token and verifies if the user has the required permission for a specific system.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Permission check result returned"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    @Order(11)
+    @PostMapping("/check-permission")
+    public PermissionCheckResponse checkPermission(@Valid @RequestBody PermissionCheckRequest request) {
+        return userService.checkPermission(request);
     }
 
     @Operation(summary = "Send Verification Code", description = "Generates a verification code and sends it to the provided email address. The code expires in 60 seconds.")

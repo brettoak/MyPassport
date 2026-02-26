@@ -31,6 +31,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import org.springframework.util.AntPathMatcher;
+import com.brett.mypassport.dto.PermissionCheckRequest;
+import com.brett.mypassport.dto.PermissionCheckResponse;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -425,6 +428,59 @@ public class UserService implements UserDetailsService {
         } catch (Exception e) {
             return Map.of("valid", false, "reason", "Invalid token: " + e.getMessage());
         }
+    }
+
+    public PermissionCheckResponse checkPermission(PermissionCheckRequest request) {
+        // 1. Validate Token First
+        Map<String, Object> tokenValidation = validateToken(request.getToken());
+        if (!(boolean) tokenValidation.get("valid")) {
+            return new PermissionCheckResponse(false, false, null, (String) tokenValidation.get("reason"));
+        }
+
+        String username = (String) tokenValidation.get("username");
+
+        // 2. Load User and Roles
+        User user = userRepository.findByUsername(username).orElse(null);
+        if (user == null) {
+            return new PermissionCheckResponse(false, false, username, "User not found");
+        }
+
+        // 3. Extract permissions for the specific mapping (sysCode)
+        Set<String> userPermissions = new HashSet<>();
+        for (Role role : user.getRoles()) {
+            if (role.getSysCode() != null && role.getSysCode().equals(request.getSysCode())) {
+                for (com.brett.mypassport.entity.Permission permission : role.getPermissions()) {
+                    if (permission.getSysCode() != null && permission.getSysCode().equals(request.getSysCode())) {
+                        userPermissions.add(permission.getName());
+                    }
+                }
+            }
+        }
+
+        // 4. Verify Permission
+        boolean hasPermission = false;
+
+        // 4a. Check Exact Permission String if provided
+        if (request.getRequiredPermission() != null && !request.getRequiredPermission().isEmpty()) {
+            hasPermission = userPermissions.contains(request.getRequiredPermission());
+        } 
+        // 4b. Check Path with AntPathMatcher if provided
+        else if (request.getPath() != null && !request.getPath().isEmpty()) {
+            AntPathMatcher pathMatcher = new AntPathMatcher();
+            for (String perm : userPermissions) {
+                // Assuming perm could be an ant pattern like /api/v1/orders/**
+                if (pathMatcher.match(perm, request.getPath())) {
+                    hasPermission = true;
+                    break;
+                }
+            }
+        } else {
+            // If neither requiredPermission nor path is provided, but token is valid,
+            // we might consider it just an authentication check.
+            hasPermission = true;
+        }
+
+        return new PermissionCheckResponse(true, hasPermission, username, hasPermission ? "Permission granted" : "Permission denied");
     }
 
     /**

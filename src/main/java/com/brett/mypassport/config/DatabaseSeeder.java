@@ -92,6 +92,7 @@ public class DatabaseSeeder implements ApplicationRunner {
         p.setName(name);
         p.setDescription(description);
         p.setModule(module);
+        p.setSysCode("passport"); // Set default sys_code for passport system permissions
         return p;
     }
 
@@ -99,6 +100,7 @@ public class DatabaseSeeder implements ApplicationRunner {
         Role r = roleRepository.findByName(name).orElseGet(Role::new);
         r.setName(name);
         r.setDescription(description);
+        r.setSysCode("passport"); // Set default sys_code for passport system roles
         return r;
     }
 

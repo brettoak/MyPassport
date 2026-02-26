@@ -14,6 +14,9 @@ public class Permission {
     @Column(nullable = false, unique = true)
     private String name;
 
+    @Column(name = "sys_code", nullable = false)
+    private String sysCode;
+
     @Column
     private String description;
 
@@ -61,6 +64,14 @@ public class Permission {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getSysCode() {
+        return sysCode;
+    }
+
+    public void setSysCode(String sysCode) {
+        this.sysCode = sysCode;
     }
 
     public String getModule() {
