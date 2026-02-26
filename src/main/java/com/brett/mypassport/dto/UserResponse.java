@@ -1,6 +1,7 @@
 package com.brett.mypassport.dto;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Set;
 
 public class UserResponse {
@@ -9,13 +10,13 @@ public class UserResponse {
     private String email;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private Set<String> roles;
-    private Set<String> permissions;
+    private Map<String, Set<String>> roles;
+    private Map<String, Set<String>> permissions;
 
     public UserResponse() {
     }
 
-    public UserResponse(Long id, String username, String email, LocalDateTime createdAt, LocalDateTime updatedAt, Set<String> roles, Set<String> permissions) {
+    public UserResponse(Long id, String username, String email, LocalDateTime createdAt, LocalDateTime updatedAt, Map<String, Set<String>> roles, Map<String, Set<String>> permissions) {
         this.id = id;
         this.username = username;
         this.email = email;
@@ -65,19 +66,19 @@ public class UserResponse {
         this.updatedAt = updatedAt;
     }
 
-    public Set<String> getRoles() {
+    public Map<String, Set<String>> getRoles() {
         return roles;
     }
 
-    public void setRoles(Set<String> roles) {
+    public void setRoles(Map<String, Set<String>> roles) {
         this.roles = roles;
     }
 
-    public Set<String> getPermissions() {
+    public Map<String, Set<String>> getPermissions() {
         return permissions;
     }
 
-    public void setPermissions(Set<String> permissions) {
+    public void setPermissions(Map<String, Set<String>> permissions) {
         this.permissions = permissions;
     }
 }

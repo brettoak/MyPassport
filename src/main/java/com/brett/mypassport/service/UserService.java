@@ -258,14 +258,19 @@ public class UserService implements UserDetailsService {
     }
     
     private UserResponse mapUserToUserResponse(User user) {
-        Set<String> roles = user.getRoles().stream()
-                .map(Role::getName)
-                .collect(java.util.stream.Collectors.toSet());
+        java.util.Map<String, Set<String>> roles = user.getRoles().stream()
+                .collect(java.util.stream.Collectors.groupingBy(
+                        Role::getSysCode,
+                        java.util.stream.Collectors.mapping(Role::getName, java.util.stream.Collectors.toSet())
+                ));
 
-        Set<String> permissions = user.getRoles().stream()
-                .flatMap(role -> role.getPermissions().stream())
-                .map(com.brett.mypassport.entity.Permission::getName)
-                .collect(java.util.stream.Collectors.toSet());
+        java.util.Map<String, Set<String>> permissions = user.getRoles().stream()
+                .flatMap(role -> role.getPermissions().stream()
+                        .map(p -> new java.util.AbstractMap.SimpleEntry<>(role.getSysCode(), p.getName())))
+                .collect(java.util.stream.Collectors.groupingBy(
+                        java.util.Map.Entry::getKey,
+                        java.util.stream.Collectors.mapping(java.util.Map.Entry::getValue, java.util.stream.Collectors.toSet())
+                ));
 
         return new UserResponse(
                 user.getId(),

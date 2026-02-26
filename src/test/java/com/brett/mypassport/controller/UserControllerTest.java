@@ -67,7 +67,7 @@ public class UserControllerTest {
     public void testGetUserProfileSuccess() throws Exception {
         UserResponse mockResponse = new UserResponse(
                 1L, "testuser", "test@example.com", LocalDateTime.now(), LocalDateTime.now(),
-                java.util.Collections.emptySet(), java.util.Collections.emptySet()
+                java.util.Collections.emptyMap(), java.util.Collections.emptyMap()
         );
 
         when(userService.getUserProfile("testuser")).thenReturn(mockResponse);
@@ -178,7 +178,7 @@ public class UserControllerTest {
     public void testGetAllUsersSuccess() throws Exception {
         UserResponse mockResponse = new UserResponse(
                 1L, "testuser", "test@example.com", LocalDateTime.now(), LocalDateTime.now(),
-                java.util.Collections.emptySet(), java.util.Collections.emptySet()
+                java.util.Collections.emptyMap(), java.util.Collections.emptyMap()
         );
         PageImpl<UserResponse> page = new PageImpl<>(Arrays.asList(mockResponse), PageRequest.of(0, 10), 1);
 
@@ -196,7 +196,7 @@ public class UserControllerTest {
     public void testGetUserByIdSuccess() throws Exception {
         UserResponse mockResponse = new UserResponse(
                 1L, "testuser", "test@example.com", LocalDateTime.now(), LocalDateTime.now(),
-                java.util.Collections.emptySet(), java.util.Collections.emptySet()
+                java.util.Collections.emptyMap(), java.util.Collections.emptyMap()
         );
 
         when(userService.getUserById(1L)).thenReturn(mockResponse);
