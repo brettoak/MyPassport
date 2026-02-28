@@ -10,6 +10,10 @@ name: Build and Deploy
 # - SERVER_HOST, SERVER_USER, SERVER_SSH_KEY
 # - DB_URL, DB_USERNAME, DB_PASSWORD
 # - PROD_REDIS_* and PROD_MAIL_* configurations
+#
+# Required Manual Settings:
+# - DOMAIN_NAME AND SET DNS
+# - DATABASE SERVER SECURITY GROUP SETTINGS
 # ==========================================
 
 on:
