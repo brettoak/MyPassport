@@ -45,78 +45,95 @@ public class DatabaseSeeder implements ApplicationRunner {
     private void seedPermissionsAndRoles() {
         System.out.println("Seeding/Updating permissions...");
         // User Management Permissions
-        Permission userView = createOrUpdatePermission(PermissionConstants.USER_VIEW, "View user details and lists", "USER_MANAGEMENT");
-        Permission userCreate = createOrUpdatePermission(PermissionConstants.USER_CREATE, "Create new users", "USER_MANAGEMENT");
-        Permission userUpdate = createOrUpdatePermission(PermissionConstants.USER_UPDATE, "Edit user details", "USER_MANAGEMENT");
-        Permission userDelete = createOrUpdatePermission(PermissionConstants.USER_DELETE, "Delete users", "USER_MANAGEMENT");
+        Permission userView = createOrUpdatePermission("passport", PermissionConstants.USER_VIEW, "View user details and lists", "USER_MANAGEMENT");
+        Permission userCreate = createOrUpdatePermission("passport", PermissionConstants.USER_CREATE, "Create new users", "USER_MANAGEMENT");
+        Permission userUpdate = createOrUpdatePermission("passport", PermissionConstants.USER_UPDATE, "Edit user details", "USER_MANAGEMENT");
+        Permission userDelete = createOrUpdatePermission("passport", PermissionConstants.USER_DELETE, "Delete users", "USER_MANAGEMENT");
 
         // Role Management Permissions
-        Permission roleView = createOrUpdatePermission(PermissionConstants.ROLE_VIEW, "View roles and permissions", "ROLE_MANAGEMENT");
-        Permission roleCreate = createOrUpdatePermission(PermissionConstants.ROLE_CREATE, "Create new roles", "ROLE_MANAGEMENT");
-        Permission roleUpdate = createOrUpdatePermission(PermissionConstants.ROLE_UPDATE, "Edit roles", "ROLE_MANAGEMENT");
-        Permission roleDelete = createOrUpdatePermission(PermissionConstants.ROLE_DELETE, "Delete roles", "ROLE_MANAGEMENT");
-        Permission roleAssign = createOrUpdatePermission(PermissionConstants.ROLE_ASSIGN, "Assign roles to users", "ROLE_MANAGEMENT");
-        Permission permissionView = createOrUpdatePermission(PermissionConstants.PERMISSION_VIEW, "View system permissions", "ROLE_MANAGEMENT");
+        Permission roleView = createOrUpdatePermission("passport", PermissionConstants.ROLE_VIEW, "View roles and permissions", "ROLE_MANAGEMENT");
+        Permission roleCreate = createOrUpdatePermission("passport", PermissionConstants.ROLE_CREATE, "Create new roles", "ROLE_MANAGEMENT");
+        Permission roleUpdate = createOrUpdatePermission("passport", PermissionConstants.ROLE_UPDATE, "Edit roles", "ROLE_MANAGEMENT");
+        Permission roleDelete = createOrUpdatePermission("passport", PermissionConstants.ROLE_DELETE, "Delete roles", "ROLE_MANAGEMENT");
+        Permission roleAssign = createOrUpdatePermission("passport", PermissionConstants.ROLE_ASSIGN, "Assign roles to users", "ROLE_MANAGEMENT");
+        Permission permissionView = createOrUpdatePermission("passport", PermissionConstants.PERMISSION_VIEW, "View system permissions", "ROLE_MANAGEMENT");
 
         // Device/Session Management Permissions
-        Permission deviceView = createOrUpdatePermission(PermissionConstants.DEVICE_VIEW, "View active sessions and devices", "DEVICE_MANAGEMENT");
-        Permission deviceKick = createOrUpdatePermission(PermissionConstants.DEVICE_KICK, "Terminate active sessions", "DEVICE_MANAGEMENT");
+        Permission deviceView = createOrUpdatePermission("passport", PermissionConstants.DEVICE_VIEW, "View active sessions and devices", "DEVICE_MANAGEMENT");
+        Permission deviceKick = createOrUpdatePermission("passport", PermissionConstants.DEVICE_KICK, "Terminate active sessions", "DEVICE_MANAGEMENT");
 
         // System Configuration Permissions
-        Permission sysConfigView = createOrUpdatePermission(PermissionConstants.SYS_CONFIG_VIEW, "View system configurations", "SYSTEM_CONFIG");
-        Permission sysConfigEdit = createOrUpdatePermission(PermissionConstants.SYS_CONFIG_EDIT, "Edit system configurations", "SYSTEM_CONFIG");
+        Permission sysConfigView = createOrUpdatePermission("passport", PermissionConstants.SYS_CONFIG_VIEW, "View system configurations", "SYSTEM_CONFIG");
+        Permission sysConfigEdit = createOrUpdatePermission("passport", PermissionConstants.SYS_CONFIG_EDIT, "Edit system configurations", "SYSTEM_CONFIG");
         
-        List<Permission> allPermissions = Arrays.asList(
+        // --- SevWatch System Permissions ---
+        Permission sevwatchDashboard = createOrUpdatePermission("SevWatch", "dashboard:view", "View SevWatch Dashboard", "SEVWATCH_CORE");
+        Permission sevwatchAlerts = createOrUpdatePermission("SevWatch", "alerts:manage", "Manage SevWatch Alerts", "SEVWATCH_CORE");
+        
+        List<Permission> passportPermissions = Arrays.asList(
                 userView, userCreate, userUpdate, userDelete,
                 roleView, roleCreate, roleUpdate, roleDelete, roleAssign, permissionView,
                 deviceView, deviceKick,
                 sysConfigView, sysConfigEdit
         );
         
-        permissionRepository.saveAll(allPermissions);
+        List<Permission> sevwatchPermissions = Arrays.asList(
+                sevwatchDashboard, sevwatchAlerts
+        );
+        
+        permissionRepository.saveAll(passportPermissions);
+        permissionRepository.saveAll(sevwatchPermissions);
 
         System.out.println("Seeding/Updating roles...");
-        Role adminRole = createOrUpdateRole("ADMIN", "System Administrator");
-        // Admin gets all permissions
-        adminRole.setPermissions(new HashSet<>(allPermissions));
-        roleRepository.save(adminRole);
+        Role passportAdminRole = createOrUpdateRole("passport", "ADMIN", "System Administrator");
+        // Passport Admin gets all passport permissions
+        passportAdminRole.setPermissions(new HashSet<>(passportPermissions));
+        roleRepository.save(passportAdminRole);
+        
+        Role sevwatchAdminRole = createOrUpdateRole("SevWatch", "ADMIN", "SevWatch Administrator");
+        // SevWatch Admin gets all SevWatch permissions
+        sevwatchAdminRole.setPermissions(new HashSet<>(sevwatchPermissions));
+        roleRepository.save(sevwatchAdminRole);
 
-        Role userRole = createOrUpdateRole("USER", "Standard User");
+        Role userRole = createOrUpdateRole("passport", "USER", "Standard User");
         // Standard User gets basic view permissions
         userRole.setPermissions(new HashSet<>(Arrays.asList(deviceView)));
         roleRepository.save(userRole);
     }
 
-    private Permission createOrUpdatePermission(String name, String description, String module) {
+    private Permission createOrUpdatePermission(String sysCode, String name, String description, String module) {
         Permission p = permissionRepository.findByName(name).orElseGet(Permission::new);
         p.setName(name);
         p.setDescription(description);
         p.setModule(module);
-        p.setSysCode("passport"); // Set default sys_code for passport system permissions
+        p.setSysCode(sysCode);
         return p;
     }
 
-    private Role createOrUpdateRole(String name, String description) {
-        Role r = roleRepository.findByName(name).orElseGet(Role::new);
+    private Role createOrUpdateRole(String sysCode, String name, String description) {
+        Role r = roleRepository.findByNameAndSysCode(name, sysCode).orElseGet(Role::new);
         r.setName(name);
         r.setDescription(description);
-        r.setSysCode("passport"); // Set default sys_code for passport system roles
+        r.setSysCode(sysCode);
         return r;
     }
 
     private void seedUsers() {
         System.out.println("Checking database users...");
         
-        Role adminRole = roleRepository.findByName("ADMIN").orElse(null);
-        Role userRole = roleRepository.findByName("USER").orElse(null);
+        Role passportAdminRole = roleRepository.findByNameAndSysCode("ADMIN", "passport").orElse(null);
+        Role sevwatchAdminRole = roleRepository.findByNameAndSysCode("ADMIN", "SevWatch").orElse(null);
+        Role userRole = roleRepository.findByNameAndSysCode("USER", "passport").orElse(null);
 
         // Seed Admin User
         User admin = userRepository.findByUsername("admin@example.com").orElseGet(User::new);
         admin.setUsername("admin@example.com");
         admin.setPassword(passwordEncoder.encode("admin123"));
         admin.setEmail("admin@example.com");
-        if (adminRole != null) {
-            admin.setRoles(new HashSet<>(Arrays.asList(adminRole)));
+        if (passportAdminRole != null && sevwatchAdminRole != null) {
+            admin.setRoles(new HashSet<>(Arrays.asList(passportAdminRole, sevwatchAdminRole)));
+        } else if (passportAdminRole != null) {
+            admin.setRoles(new HashSet<>(Arrays.asList(passportAdminRole)));
         }
         userRepository.save(admin);
         System.out.println("Seeded/Updated admin@example.com");
