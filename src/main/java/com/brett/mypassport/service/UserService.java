@@ -469,12 +469,22 @@ public class UserService implements UserDetailsService {
         if (request.getRequiredPermission() != null && !request.getRequiredPermission().isEmpty()) {
             hasPermission = userPermissions.contains(request.getRequiredPermission());
         } 
-        // 4b. Check Path with AntPathMatcher if provided
+        // 4b. Check Path and Method with AntPathMatcher if provided
         else if (request.getPath() != null && !request.getPath().isEmpty()) {
             AntPathMatcher pathMatcher = new AntPathMatcher();
+            String path = request.getPath();
+            String methodAndPath = request.getMethod() != null && !request.getMethod().isEmpty() 
+                    ? request.getMethod().toUpperCase() + ":" + path 
+                    : null;
+
             for (String perm : userPermissions) {
-                // Assuming perm could be an ant pattern like /api/v1/orders/**
-                if (pathMatcher.match(perm, request.getPath())) {
+                // 1. Check exact method:path pattern (e.g. "GET:/api/v1/orders/**")
+                if (methodAndPath != null && pathMatcher.match(perm, methodAndPath)) {
+                    hasPermission = true;
+                    break;
+                }
+                // 2. Fallback to check just the path pattern (e.g. "/api/v1/orders/**") regardless of method
+                if (pathMatcher.match(perm, path)) {
                     hasPermission = true;
                     break;
                 }
