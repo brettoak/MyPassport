@@ -5,10 +5,14 @@ MyPassport is a comprehensive User Center interface designed to provide robust a
 ## 🚀 Features
 
 - **User Registration & Email Verification**: Secure sign-up process with email verification code support (via JavaMailSender).
-- **Authentication (Login)**: Robust login mechanism using Spring Security and JWT.
-- **Advanced Token Management**: JWT-based access tokens with refresh token support, plus Redis-backed token revocation (Logout / Logout All Devices).
-- **Authorization**: Role-Based Access Control (RBAC) to manage users, roles, and permissions dynamically.
-- **Password Management**: Forgot password and reset password flows using email verification.
+- **Authentication (Login)**: Robust login mechanism using Spring Security and RSA-signed JWT.
+- **Advanced Token Management**: JWT-based access tokens with refresh token support, plus Redis-backed token revocation (Logout / Logout All Devices / Kick Specific Device).
+- **Multi-System RBAC (Role-Based Access Control)**: 
+  - Centralized permission management for multiple downstream systems (e.g., `passport`, `sys-b`).
+  - Scoped roles and permissions using `sysCode` markers.
+  - Dedicated `/check-permission` endpoint supporting exact string matches, wildcard paths (`/api/v1/orders/**`), and method+path combos (`GET:/api/v1/users`).
+- **Dynamic Profile Delivery**: The user profile payload groups roles and permissions by their respective systems natively (`Map<String, Set<String>>`).
+- **Password Management**: Forgot password and secure password reset workflows.
 - **API Documentation**: Built-in Swagger UI powered by Springdoc OpenAPI.
 - **Database Migration**: Automated schema management using Flyway.
 
@@ -86,16 +90,40 @@ java -jar target/MyPassport-0.0.1-SNAPSHOT.jar --spring.profiles.active=prod
 
 By default, the application will start on `http://localhost:8089`.
 
+## 🚢 Deployment & Environment Migration
+
+If you are changing the deployment server or migrating to a new environment, please ensure you update the following configurations to maintain continuous integration and application stability.
+
+### 1. GitHub Actions Secrets
+The CI/CD pipeline located in `.github/workflows/deploy.yml` relies on GitHub Action Secrets to securely connect to your server and inject production variables. If your server changes, you must go to your repository's **Settings -> Secrets and variables -> Actions** and update the following:
+
+- **Server Authentication**: 
+  - `SERVER_HOST` (The new server's IP address)
+  - `SERVER_USER` (The new server's SSH username)
+  - `SERVER_SSH_KEY` (The new server's private SSH key for passwordless login)
+- **Database Connection**: 
+  - `DB_URL` (e.g., `jdbc:mysql://new-db-host:3306/mypassport_prod`)
+  - `DB_USERNAME`
+  - `DB_PASSWORD`
+- **Other Infrastructure**: Any `PROD_REDIS_*` or `PROD_MAIL_*` variables if those services are also being migrated.
+
+### 2. MySQL Connection Security
+When moving to a new server, the database's remote access permissions must be updated:
+- Ensure the new application server's IP address is whitelisted in your MySQL server's **Security Groups** or firewall (e.g., AWS Security Groups, UFW, or iptables).
+- Ensure the MySQL database user (`DB_USERNAME`) has the correct host privileges (e.g., `user@'new-app-server-ip'`) to connect remotely.
+
 ## 📚 API Documentation
 
 Once the application is running, you can view the API documentation and test endpoints using Swagger UI:
 [http://localhost:8089/swagger-ui/index.html](http://localhost:8089/swagger-ui/index.html)
 
 ### Core API Modules
-- **/api/v1/auth**: Registration, Login, Token Refresh, Password Reset, Check Token, Logout, Send Verification Code.
-- **/api/v1/users**: User profile management.
-- **/api/v1/roles**: Role creation and assignment.
-- **/api/v1/permissions**: Permission management for RBAC.
+- **/api/v1/auth**: Registration, Login, Token Refresh, Password Reset, Check Token, Logout. 
+  - Includes the powerful `POST /check-permission` validation endpoint for external systems.
+- **/api/v1/users**: User profile & device management.
+  - Features a multi-system profile representation where roles and permissions are partitioned by `sysCode`.
+- **/api/v1/roles**: Role creation and assignment. Supports `?sysCode=` query filters for system isolation.
+- **/api/v1/permissions**: Permission management for RBAC. Supports `?sysCode=` query filters for system isolation.
 - **/api/v1/system**: System-level configurations or health checks.
 
 ## 🤝 Contributing

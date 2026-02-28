@@ -1,5 +1,17 @@
 name: Build and Deploy
 
+# ==========================================
+# ⚠️ DEPLOYMENT & MIGRATION WARNING ⚠️
+# If you are migrating this application to a new server or environment,
+# you MUST update the corresponding GitHub Repository Secrets to match the
+# new environment. Failure to do so will break the CI/CD pipeline.
+# 
+# Required Secrets to update under Settings -> Secrets and variables -> Actions:
+# - SERVER_HOST, SERVER_USER, SERVER_SSH_KEY
+# - DB_URL, DB_USERNAME, DB_PASSWORD
+# - PROD_REDIS_* and PROD_MAIL_* configurations
+# ==========================================
+
 on:
   push:
     branches: [ "main" ]
