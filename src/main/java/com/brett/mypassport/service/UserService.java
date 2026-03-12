@@ -436,6 +436,7 @@ public class UserService implements UserDetailsService {
     }
 
     public PermissionCheckResponse checkPermission(PermissionCheckRequest request) {
+        System.out.println("Checking permission for token: " + request.getToken() + ", sysCode: " + request.getSysCode() + ", requiredPermission: " + request.getRequiredPermission() + ", path: " + request.getPath() + ", method: " + request.getMethod());
         // 1. Validate Token First
         Map<String, Object> tokenValidation = validateToken(request.getToken());
         if (!(boolean) tokenValidation.get("valid")) {
@@ -462,13 +463,15 @@ public class UserService implements UserDetailsService {
             }
         }
 
+        System.out.println("User " + username + " has permissions for sysCode " + request.getSysCode() + ": " + userPermissions);
+
         // 4. Verify Permission
         boolean hasPermission = false;
 
         // 4a. Check Exact Permission String if provided
         if (request.getRequiredPermission() != null && !request.getRequiredPermission().isEmpty()) {
             hasPermission = userPermissions.contains(request.getRequiredPermission());
-        } 
+        }
         // 4b. Check Path and Method with AntPathMatcher if provided
         else if (request.getPath() != null && !request.getPath().isEmpty()) {
             AntPathMatcher pathMatcher = new AntPathMatcher();
