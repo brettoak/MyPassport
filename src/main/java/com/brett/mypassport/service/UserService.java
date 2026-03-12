@@ -467,35 +467,57 @@ public class UserService implements UserDetailsService {
 
         // 4. Verify Permission
         boolean hasPermission = false;
+        boolean checked = false;
 
         // 4a. Check Exact Permission String if provided
         if (request.getRequiredPermission() != null && !request.getRequiredPermission().isEmpty()) {
             hasPermission = userPermissions.contains(request.getRequiredPermission());
+            checked = true;
+            if (!hasPermission) {
+                return new PermissionCheckResponse(true, false, username, "Lack of required permission string");
+            }
         }
+
         // 4b. Check Path and Method with AntPathMatcher if provided
-        else if (request.getPath() != null && !request.getPath().isEmpty()) {
+        if (request.getPath() != null && !request.getPath().isEmpty()) {
             AntPathMatcher pathMatcher = new AntPathMatcher();
             String path = request.getPath();
             String methodAndPath = request.getMethod() != null && !request.getMethod().isEmpty() 
                     ? request.getMethod().toUpperCase() + ":" + path 
                     : null;
 
+            boolean pathMatched = false;
             for (String perm : userPermissions) {
-                // 1. Check exact method:path pattern (e.g. "GET:/api/v1/orders/**")
-                if (methodAndPath != null && pathMatcher.match(perm, methodAndPath)) {
-                    hasPermission = true;
-                    break;
+                // Ensure permission string can act as a prefix if it ends with a wildcard
+                String normalizedPerm = perm;
+                boolean isPrefixMatch = perm.endsWith("/*") || perm.endsWith("/**");
+                if (isPrefixMatch) {
+                   normalizedPerm = perm.replaceAll("/\\*+$", "/");
                 }
+
+                // 1. Check exact method:path pattern (e.g. "GET:/api/v1/orders/**")
+                if (methodAndPath != null) {
+                     if (pathMatcher.match(perm, methodAndPath) || 
+                        (isPrefixMatch && methodAndPath.contains(":") && methodAndPath.substring(methodAndPath.indexOf(":") + 1).startsWith(normalizedPerm))) {
+                           pathMatched = true;
+                           break;
+                     }
+                }
+                
                 // 2. Fallback to check just the path pattern (e.g. "/api/v1/orders/**") regardless of method
-                if (pathMatcher.match(perm, path)) {
-                    hasPermission = true;
+                if (pathMatcher.match(perm, path) || (isPrefixMatch && path.startsWith(normalizedPerm))) {
+                    pathMatched = true;
                     break;
                 }
             }
-        } else {
+            hasPermission = pathMatched;
+            checked = true;
+        }
+
+        if (!checked) {
             // If neither requiredPermission nor path is provided, but token is valid,
             // we might consider it just an authentication check.
-            hasPermission = true;
+            hasPermission = false;
         }
 
         return new PermissionCheckResponse(true, hasPermission, username, hasPermission ? "Permission granted" : "Permission denied");
