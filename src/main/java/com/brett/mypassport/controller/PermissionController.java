@@ -43,7 +43,7 @@ public class PermissionController {
     public Page<PermissionResponse> getAllPermissions(
             @Parameter(description = "Optional system code to filter permissions by", example = "sys-b") @RequestParam(required = false) String sysCode,
             @RequestParam(defaultValue = "0") @Min(value = 0, message = "Page index must not be less than zero") int page,
-            @RequestParam(defaultValue = "10") @Min(value = 0, message = "Page size must not be less than zero") @Max(value = 30, message = "Page size must not be greater than 30") int size) {
+            @RequestParam(defaultValue = "30") @Min(value = 0, message = "Page size must not be less than zero") @Max(value = 30, message = "Page size must not be greater than 30") int size) {
         Pageable pageable = PageRequest.of(page, size);
         return permissionService.getAllPermissions(sysCode, pageable);
     }
