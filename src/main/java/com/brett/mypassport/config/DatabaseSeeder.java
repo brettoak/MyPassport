@@ -69,6 +69,7 @@ public class DatabaseSeeder implements ApplicationRunner {
         // --- SevWatch System Permissions ---
         Permission sevwatchDashboard = createOrUpdatePermission("SevWatch", "dashboard:view", "View SevWatch Dashboard", "SEVWATCH_CORE");
         Permission sevwatchAlerts = createOrUpdatePermission("SevWatch", "alerts:manage", "Manage SevWatch Alerts", "SEVWATCH_CORE");
+        Permission sevwatchApiPrefix = createOrUpdatePermission("SevWatch", "/api/v1/sev/**", "Allow all SevWatch API endpoints", "SEVWATCH_CORE");
         
         List<Permission> passportPermissions = Arrays.asList(
                 userView, userCreate, userUpdate, userDelete,
@@ -78,7 +79,7 @@ public class DatabaseSeeder implements ApplicationRunner {
         );
         
         List<Permission> sevwatchPermissions = Arrays.asList(
-                sevwatchDashboard, sevwatchAlerts
+                sevwatchDashboard, sevwatchAlerts, sevwatchApiPrefix
         );
         
         permissionRepository.saveAll(passportPermissions);
