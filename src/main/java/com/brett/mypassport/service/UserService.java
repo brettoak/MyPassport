@@ -436,7 +436,6 @@ public class UserService implements UserDetailsService {
     }
 
     public PermissionCheckResponse checkPermission(PermissionCheckRequest request) {
-        System.out.println("Checking permission for token: " + request.getToken() + ", sysCode: " + request.getSysCode() + ", requiredPermission: " + request.getRequiredPermission() + ", path: " + request.getPath() + ", method: " + request.getMethod());
         // 1. Validate Token First
         Map<String, Object> tokenValidation = validateToken(request.getToken());
         if (!(boolean) tokenValidation.get("valid")) {
@@ -463,7 +462,6 @@ public class UserService implements UserDetailsService {
             }
         }
 
-        System.out.println("User " + username + " has permissions for sysCode " + request.getSysCode() + ": " + userPermissions);
 
         // 4. Verify Permission
         boolean hasPermission = false;
