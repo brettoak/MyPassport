@@ -472,7 +472,7 @@ public class UserService implements UserDetailsService {
             hasPermission = userPermissions.contains(request.getRequiredPermission());
             checked = true;
             if (!hasPermission) {
-                return new PermissionCheckResponse(true, false, username, "Lack of required permission string");
+//                return new PermissionCheckResponse(true, false, username, "Lack of required permission string");
             }
         }
 
