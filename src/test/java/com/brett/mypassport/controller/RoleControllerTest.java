@@ -59,6 +59,7 @@ public class RoleControllerTest {
         RoleRequest request = new RoleRequest();
         request.setName("ADMIN");
         request.setDescription("Administrator role");
+        request.setSysCode("sys-b");
 
         RoleResponse response = new RoleResponse();
         response.setId(1L);
@@ -126,6 +127,7 @@ public class RoleControllerTest {
         RoleRequest request = new RoleRequest();
         request.setName("SUPER_ADMIN");
         request.setDescription("Updated description");
+        request.setSysCode("sys-b");
 
         RoleResponse response = new RoleResponse();
         response.setId(1L);
