@@ -19,4 +19,4 @@ spring:
     password: test-password
 
 server:
-  port: 8080 # Standard port for test/stage often varies or stays 8080
+  port: 8089 # Standard port for test/stage often varies or stays 8080

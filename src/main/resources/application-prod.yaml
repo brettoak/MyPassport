@@ -22,7 +22,7 @@ spring:
     password: ${PROD_MAIL_PASSWORD}
 
 server:
-  port: 8080
+  port: 8089
   forward-headers-strategy: framework
   tomcat:
     remoteip:
