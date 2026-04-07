@@ -81,7 +81,7 @@ jobs:
         host: ${{ secrets.SERVER_HOST }}
         username: ${{ secrets.SERVER_USER }}
         key: ${{ secrets.SERVER_SSH_KEY }}
-        source: "nginx/app.conf"
+        source: "nginx/passport.conf"
         target: "/home/${{ secrets.SERVER_USER }}/app"
 
     - name: Configure Nginx & Restart App
@@ -93,7 +93,9 @@ jobs:
         script: |
           # Move Nginx config to the correct location (requires sudo)
           # Assuming the user has sudo privileges without password or provided via secrets (not handled here, standard assumption for CI/CD user)
-          echo "${{ secrets.SERVER_USER_PASSWORD }}" | sudo -S mv /home/${{ secrets.SERVER_USER }}/app/nginx/app.conf /etc/nginx/conf.d/app.conf
+          echo "${{ secrets.SERVER_USER_PASSWORD }}" | sudo -S mv /home/${{ secrets.SERVER_USER }}/app/nginx/passport.conf /etc/nginx/conf.d/passport.conf
+          # Delete the old app.conf to avoid Nginx conflicts
+          echo "${{ secrets.SERVER_USER_PASSWORD }}" | sudo -S rm -f /etc/nginx/conf.d/app.conf
           echo "${{ secrets.SERVER_USER_PASSWORD }}" | sudo -S nginx -t && echo "${{ secrets.SERVER_USER_PASSWORD }}" | sudo -S nginx -s reload
 
           # Navigate to the deployment directory
