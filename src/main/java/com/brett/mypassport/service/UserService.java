@@ -84,23 +84,8 @@ public class UserService implements UserDetailsService {
     }
 
     private void saveUserToken(User user, String jwtToken, String refreshToken, String ipAddress, String deviceInfo) {
-        // 1. Find existing valid tokens for this user
-        List<Token> validTokens = tokenRepository.findAllValidTokensByUser(user.getId());
-
-        // 2. Revoke any token that comes from the SAME device
-        if (deviceInfo != null && !validTokens.isEmpty()) {
-            List<Token> tokensToRevoke = validTokens.stream()
-                    .filter(t -> deviceInfo.equals(t.getDeviceInfo()))
-                    .peek(t -> {
-                        t.setRevoked(true);
-                        t.setExpired(true);
-                    })
-                    .toList();
-            
-            if (!tokensToRevoke.isEmpty()) {
-                tokenRepository.saveAll(tokensToRevoke);
-            }
-        }
+        // Notice: Previously this method revoked old tokens from the same device (User-Agent).
+        // That logic has been removed to allow multiple active logins from the same browser.
 
         // 3. Save new token
         Token token = new Token();
