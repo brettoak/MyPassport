@@ -8,6 +8,7 @@ public class UserResponse {
     private Long id;
     private String username;
     private String email;
+    private String avatarUrl;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private Map<String, Set<String>> roles;
@@ -16,10 +17,11 @@ public class UserResponse {
     public UserResponse() {
     }
 
-    public UserResponse(Long id, String username, String email, LocalDateTime createdAt, LocalDateTime updatedAt, Map<String, Set<String>> roles, Map<String, Set<String>> permissions) {
+    public UserResponse(Long id, String username, String email, String avatarUrl, LocalDateTime createdAt, LocalDateTime updatedAt, Map<String, Set<String>> roles, Map<String, Set<String>> permissions) {
         this.id = id;
         this.username = username;
         this.email = email;
+        this.avatarUrl = avatarUrl;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.roles = roles;
@@ -48,6 +50,14 @@ public class UserResponse {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getAvatarUrl() {
+        return avatarUrl;
+    }
+
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
     }
 
     public LocalDateTime getCreatedAt() {

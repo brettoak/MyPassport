@@ -2,8 +2,13 @@ package com.brett.mypassport.service;
 
 import java.util.List;
 import java.util.Map;
+import java.io.File;
+import java.io.IOException;
+import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.beans.factory.annotation.Value;
 import com.brett.mypassport.dto.LoginRequest;
 import com.brett.mypassport.dto.LoginResponse;
 import com.brett.mypassport.dto.LoginResponse;
@@ -55,6 +60,12 @@ public class UserService implements UserDetailsService {
 
     @Autowired
     private RoleRepository roleRepository;
+
+    @Value("${app.upload.avatar-path}")
+    private String avatarPath;
+
+    @Value("${app.upload.avatar-url-prefix}")
+    private String avatarUrlPrefix;
 
     public LoginResponse login(LoginRequest request, String ipAddress, String deviceInfo) {
         // 1. Find user by email (or username, logic can be added)
@@ -261,6 +272,7 @@ public class UserService implements UserDetailsService {
                 user.getId(),
                 user.getUsername(),
                 user.getEmail(),
+                user.getAvatarUrl(),
                 user.getCreatedAt(),
                 user.getUpdatedAt(),
                 roles,
@@ -527,6 +539,48 @@ public class UserService implements UserDetailsService {
 
         user.setRoles(roles);
         userRepository.save(user);
+    }
+
+    @Transactional
+    public String uploadAvatar(String username, MultipartFile file) {
+        if (file.isEmpty()) {
+            throw new IllegalArgumentException("File is empty");
+        }
+
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        try {
+            // Ensure directory exists
+            File dir = new File(avatarPath);
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
+
+            // Generate unique filename
+            String originalFilename = file.getOriginalFilename();
+            String extension = "";
+            if (originalFilename != null && originalFilename.contains(".")) {
+                extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+            }
+            String newFilename = UUID.randomUUID().toString() + extension;
+
+            // Save file
+            File destination = new File(dir, newFilename);
+            file.transferTo(destination);
+
+            // Construct URL
+            String fullUrl = avatarUrlPrefix + newFilename;
+
+            // Update user
+            user.setAvatarUrl(fullUrl);
+            userRepository.save(user);
+
+            return fullUrl;
+
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to store file", e);
+        }
     }
 }
 

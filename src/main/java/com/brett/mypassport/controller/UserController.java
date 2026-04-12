@@ -161,4 +161,23 @@ public class UserController {
     public UserResponse getUserById(@PathVariable Long id) {
         return userService.getUserById(id);
     }
+
+    @Operation(summary = "Upload Avatar", description = "Allows authenticated users to upload an avatar.")
+    @SecurityRequirement(name = "bearerAuth")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Avatar uploaded successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid file"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    @Order(17)
+    @PostMapping(value = "/avatar", consumes = org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE)
+    public com.brett.mypassport.common.ApiResponse<String> uploadAvatar(
+            @AuthenticationPrincipal UserDetails userDetails, 
+            @RequestParam("file") org.springframework.web.multipart.MultipartFile file) {
+        if (userDetails == null) {
+            throw new org.springframework.security.access.AccessDeniedException("User not authenticated");
+        }
+        String avatarUrl = userService.uploadAvatar(userDetails.getUsername(), file);
+        return com.brett.mypassport.common.ApiResponse.success(avatarUrl);
+    }
 }
