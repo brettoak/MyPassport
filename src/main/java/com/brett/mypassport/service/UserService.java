@@ -547,6 +547,19 @@ public class UserService implements UserDetailsService {
             throw new IllegalArgumentException("File is empty");
         }
 
+        // --- SECURITY ENHANCEMENT: Validate file extension ---
+        String originalFilename = file.getOriginalFilename();
+        if (originalFilename == null) {
+            throw new IllegalArgumentException("Invalid file");
+        }
+        String lowerCaseFileName = originalFilename.toLowerCase();
+        if (!lowerCaseFileName.endsWith(".jpg") && !lowerCaseFileName.endsWith(".jpeg") 
+            && !lowerCaseFileName.endsWith(".png") && !lowerCaseFileName.endsWith(".gif")
+            && !lowerCaseFileName.endsWith(".webp")) {
+            throw new IllegalArgumentException("Only image files (.jpg, .png, .gif, .webp) are allowed");
+        }
+        // -----------------------------------------------------
+
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
@@ -558,11 +571,7 @@ public class UserService implements UserDetailsService {
             }
 
             // Generate unique filename and prefix with current time to minute precision
-            String originalFilename = file.getOriginalFilename();
-            String extension = "";
-            if (originalFilename != null && originalFilename.contains(".")) {
-                extension = originalFilename.substring(originalFilename.lastIndexOf("."));
-            }
+            String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
             java.time.LocalDateTime now = java.time.LocalDateTime.now();
             java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd_HHmm");
             String timeString = now.format(formatter);
