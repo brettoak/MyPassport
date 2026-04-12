@@ -557,13 +557,16 @@ public class UserService implements UserDetailsService {
                 dir.mkdirs();
             }
 
-            // Generate unique filename
+            // Generate unique filename and prefix with current time to minute precision
             String originalFilename = file.getOriginalFilename();
             String extension = "";
             if (originalFilename != null && originalFilename.contains(".")) {
                 extension = originalFilename.substring(originalFilename.lastIndexOf("."));
             }
-            String newFilename = UUID.randomUUID().toString() + extension;
+            java.time.LocalDateTime now = java.time.LocalDateTime.now();
+            java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd_HHmm");
+            String timeString = now.format(formatter);
+            String newFilename = timeString + "_" + java.util.UUID.randomUUID().toString() + extension;
 
             // Save file
             File destination = new File(dir, newFilename);

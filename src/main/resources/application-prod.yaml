@@ -21,6 +21,10 @@ spring:
     username: ${PROD_MAIL_USERNAME}
     password: ${PROD_MAIL_PASSWORD}
 
+app:
+  upload:
+    avatar-path: /passport/avatars/
+    avatar-url-prefix: https://passport.dongyuhan.com/avatars/
 server:
   port: 8089
   forward-headers-strategy: framework
