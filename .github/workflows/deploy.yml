@@ -98,6 +98,11 @@ jobs:
           echo "${{ secrets.SERVER_USER_PASSWORD }}" | sudo -S rm -f /etc/nginx/conf.d/app.conf
           echo "${{ secrets.SERVER_USER_PASSWORD }}" | sudo -S nginx -t && echo "${{ secrets.SERVER_USER_PASSWORD }}" | sudo -S nginx -s reload
 
+          # Ensure the avatar directory exists and has correct read permissions for Nginx
+          echo "${{ secrets.SERVER_USER_PASSWORD }}" | sudo -S mkdir -p /passport/avatars
+          echo "${{ secrets.SERVER_USER_PASSWORD }}" | sudo -S chown ${{ secrets.SERVER_USER }}:${{ secrets.SERVER_USER }} /passport/avatars
+          echo "${{ secrets.SERVER_USER_PASSWORD }}" | sudo -S chmod 755 /passport/avatars
+
           # Navigate to the deployment directory
           cd /home/${{ secrets.SERVER_USER }}/app/target
           
