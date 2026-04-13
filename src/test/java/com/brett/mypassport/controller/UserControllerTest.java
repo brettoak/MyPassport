@@ -17,7 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -50,13 +50,13 @@ public class UserControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @MockitoBean
     private UserService userService;
 
-    @MockBean
+    @MockitoBean
     private JwtUtil jwtUtil;
 
-    @MockBean
+    @MockitoBean
     private RsaKeyProperties rsaKeyProperties;
 
     @Autowired
@@ -66,7 +66,7 @@ public class UserControllerTest {
     @WithMockUser(username = "testuser")
     public void testGetUserProfileSuccess() throws Exception {
         UserResponse mockResponse = new UserResponse(
-                1L, "testuser", "test@example.com", LocalDateTime.now(), LocalDateTime.now(),
+                1L, "testuser", "test@example.com", null, LocalDateTime.now(), LocalDateTime.now(),
                 java.util.Collections.emptyMap(), java.util.Collections.emptyMap()
         );
 
@@ -177,7 +177,7 @@ public class UserControllerTest {
     @WithMockUser(username = "admin", authorities = {PermissionConstants.USER_VIEW})
     public void testGetAllUsersSuccess() throws Exception {
         UserResponse mockResponse = new UserResponse(
-                1L, "testuser", "test@example.com", LocalDateTime.now(), LocalDateTime.now(),
+                1L, "testuser", "test@example.com", null, LocalDateTime.now(), LocalDateTime.now(),
                 java.util.Collections.emptyMap(), java.util.Collections.emptyMap()
         );
         PageImpl<UserResponse> page = new PageImpl<>(Arrays.asList(mockResponse), PageRequest.of(0, 10), 1);
@@ -195,7 +195,7 @@ public class UserControllerTest {
     @WithMockUser(username = "admin", authorities = {PermissionConstants.USER_VIEW})
     public void testGetUserByIdSuccess() throws Exception {
         UserResponse mockResponse = new UserResponse(
-                1L, "testuser", "test@example.com", LocalDateTime.now(), LocalDateTime.now(),
+                1L, "testuser", "test@example.com", null, LocalDateTime.now(), LocalDateTime.now(),
                 java.util.Collections.emptyMap(), java.util.Collections.emptyMap()
         );
 
