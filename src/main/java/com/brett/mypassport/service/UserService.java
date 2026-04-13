@@ -547,6 +547,11 @@ public class UserService implements UserDetailsService {
             throw new IllegalArgumentException("File is empty");
         }
 
+        // Validate file size (max 2MB)
+        if (file.getSize() > 2 * 1024 * 1024) {
+            throw new IllegalArgumentException("File size exceeds the limit of 2MB");
+        }
+
         // --- SECURITY ENHANCEMENT: Validate file extension ---
         String originalFilename = file.getOriginalFilename();
         if (originalFilename == null) {
